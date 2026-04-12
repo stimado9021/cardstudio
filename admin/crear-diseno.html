@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Maestro - TarjetasStudio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lobster&family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/crear-diseno.css">
+    <style>
+        /* Estilos específicos para asegurar el scroll y la disposición */
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar {
+            width: 200px;
+            background: #1a1a1a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .logo span { color: #ff4d29; }
+
+        .config-panel {
+            width: 350px;
+            background: white;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .config-scroll {
+            padding: 20px;
+            overflow-y: auto; /* Activamos el scroll aquí */
+            height: 100%;
+        }
+
+        .canvas-area {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        canvas {
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: default;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #444;
+        }
+
+        input[type="text"], select, input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .btn-add {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+
+        .btn-add:hover { background: #218838; }
+
+        .btn-save {
+            background: #ff4d29;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(255, 77, 41, 0.3);
+        }
+
+        .btn-save:hover { background: #e63e1c; }
+
+        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+
+        .dual-control {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">Tarjetas<span>Studio</span></div>
+        <nav style="padding: 0 20px;">
+            <div style="color: #888; font-size: 0.8rem; margin-bottom: 10px;">MENÚ</div>
+            <div style="margin-bottom: 15px; cursor: pointer; color: #ff4d29;">🎨 Editor Maestro</div>
+            <div onclick="location.href='dashboard.php'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;">📁 Mis Diseños</div>
+        </nav>
+    </div>
+
+    <div class="config-panel">
+        <div class="config-scroll">
+            <h3>General</h3>
+            
+            <div class="control-group">
+                <label>Nombre del Diseño</label>
+                <input type="text" id="nombreDiseno" placeholder="Ej: Invitación Boda - Oro">
+            </div>
+
+            <div class="control-group">
+                <label>Categoría</label>
+                <select id="categoriaSelect">
+                    </select>
+            </div>
+
+            <div class="control-group">
+                <label>Imagen de Fondo</label>
+                <input type="file" id="bgInput" accept="image/*">
+            </div>
+
+            <button class="btn-add" onclick="añadirTexto()">+ Añadir Nueva Capa de Texto</button>
+
+            <hr>
+
+            <h3>Control Maestro</h3>
+            <p style="font-size: 0.75rem; color: #888;">(Edita el texto seleccionado en el lienzo)</p>
+
+            <div class="control-group">
+                <label>Contenido del Texto</label>
+                <input type="text" id="textoInput" class="master-control" placeholder="Escribe aquí...">
+            </div>
+
+            <div class="control-group">
+                <label>Fuente</label>
+                <select id="fontFamily" class="master-control">
+                    <option value="Arial">Arial</option>
+                    <option value="'Playfair Display', serif">Playfair Display</option>
+                    <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
+                    <option value="'Lobster', cursive">Lobster</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Tamaño y Ángulo</label>
+                <div class="dual-control">
+                    <span>A:</span> <input type="range" id="anguloInput" class="master-control" min="-3.14" max="3.14" step="0.05" title="Ángulo">
+                </div>
+                <div class="dual-control">
+                    <span>T:</span> <input type="range" id="fontSize" class="master-control" min="10" max="250" value="50" title="Tamaño">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Color de Relleno</label>
+                <input type="color" id="fontColor" class="master-control" value="#ff4d29">
+            </div>
+
+            <div class="control-group">
+                <label>Borde del Texto</label>
+                <div class="dual-control">
+                    <input type="color" id="borderColor" class="master-control" value="#ffffff">
+                    <input type="range" id="borderWidth" class="master-control" min="0" max="15" step="0.5" value="2">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Sombra (Color y Difuminado)</label>
+                <input type="color" id="shadowColor" class="master-control" value="#000000">
+                <input type="range" id="shadowBlur" class="master-control" min="0" max="30" value="10">
+            </div>
+
+            <div class="control-group">
+                <label>Posición Sombra (X / Y)</label>
+                <div class="dual-control">
+                    <span>X:</span> <input type="range" id="shadowX" class="master-control" min="-30" max="30" value="5">
+                </div>
+                <div class="dual-control">
+                    <span>Y:</span> <input type="range" id="shadowY" class="master-control" min="-30" max="30" value="5">
+                </div>
+            </div>
+
+            <button id="btnGuardar" class="btn-save">GUARDAR EN BASE DE DATOS</button>
+            <div style="height: 40px;"></div> </div>
+    </div>
+
+    <div class="canvas-area">
+        <canvas id="tarjetaCanvas" width="500" height="700"></canvas>
+    </div>
+
+    <script src="js/crear-diseno.js"></script>
+</body>
+</html>

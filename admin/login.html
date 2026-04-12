@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - TarjetasStudio</title>
+    <link rel="stylesheet" href="css/crear-diseno.css"> <style>
+        .login-box { background: white; padding: 40px; border-radius: 8px; width: 300px; color: #333; }
+        .wrapper { height: 100vh; display: flex; justify-content: center; align-items: center; background: #121212; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="login-box">
+            <h2 style="margin-top:0">Iniciar Sesión</h2>
+            <div class="control-group">
+                <label>Usuario</label>
+                <input type="text" id="user" placeholder="admin">
+            </div>
+            <div class="control-group">
+                <label>Contraseña</label>
+                <input type="password" id="pass" placeholder="1234" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;">
+            </div>
+            <button class="btn-save" onclick="entrar()">ENTRAR</button>
+        </div>
+    </div>
+
+    <script>
+        async function entrar() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+
+            const formData = new FormData();
+            formData.append('user', u);
+            formData.append('pass', p);
+            console.log(formData.values) 
+            const resp = await fetch('api.php?action=login', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await resp.json();
+                console.log(data)
+            if (data.success) {
+                // Guardamos en LocalStorage como pediste
+                localStorage.setItem('user_session', JSON.stringify(data.user));
+                window.location.href = 'crear-diseno.html';
+            } else {
+                alert(data.message);
+            }
+        }
+    </script>
+</body>
+</html>

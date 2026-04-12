@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalizar mi Tarjeta - CardStudio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #ff4d29; --dark: #1a1a1a; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; display: flex; height: 100vh; background: #222; color: white; }
+        
+        .sidebar-cliente { width: 350px; background: #fff; color: #333; padding: 25px; display: flex; flex-direction: column; box-shadow: 5px 0 15px rgba(0,0,0,0.3); z-index: 10; }
+        .canvas-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 20px; }
+        
+        canvas { background: white; box-shadow: 0 0 50px rgba(0,0,0,0.5); max-width: 100%; height: auto; }
+        
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: #666; }
+        .input-group input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; font-size: 1rem; box-sizing: border-box; transition: border-color 0.3s; }
+        .input-group input:focus { border-color: var(--primary); outline: none; }
+        
+        .btn-download { background: #28a745; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: auto; }
+        .btn-back { color: var(--primary); text-decoration: none; font-size: 0.9rem; margin-bottom: 20px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-cliente">
+        <a href="index.html" class="btn-back">← Volver a Galería</a>
+        <h2 id="titulo-diseno">Personaliza tu diseño</h2>
+        <p style="font-size: 0.85rem; color: #888; margin-bottom: 30px;">Escribe en los campos de abajo para actualizar la tarjeta en tiempo real.</p>
+        
+        <div id="controles-dinamicos"></div>
+
+        <button class="btn-download" onclick="descargarTarjeta()">📥 DESCARGAR TARJETA</button>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="clienteCanvas" width="500" height="700"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('clienteCanvas');
+        const ctx = canvas.getContext('2d');
+        const params = new URLSearchParams(window.location.search);
+        const disenoId = params.get('id');
+
+        let fondoImg = new Image();
+        let textos = [];
+
+      async function init() {
+    if (!disenoId) return alert("No se seleccionó ningún diseño");
+
+    try {
+        const response = await fetch(`api_publica.php?action=get_design_details&id=${disenoId}`);
+        const data = await response.json();
+        console.log("Datos recibidos:", data); // Verifica que los nombres coincidan aquí
+
+        // 1. Cargar imagen de fondo
+        fondoImg.src = `admin/${data.imagen_fondo_url}`;
+        fondoImg.onload = () => draw();
+
+        // 2. CORRECCIÓN: Usar el nombre exacto de la columna de tu DB
+        // Según tu consola es 'configuracion_textos_json'
+        const jsonRaw = data.configuracion_textos_json || data.config_json;
+        
+        if (jsonRaw) {
+            textos = JSON.parse(jsonRaw);
+        } else {
+            console.error("No se encontró la configuración de textos en el JSON");
+        }
+
+        // 3. Crear inputs para cada texto
+        const contenedor = document.getElementById('controles-dinamicos');
+        contenedor.innerHTML = ""; // Limpiar antes de llenar
+        
+        textos.forEach((t, index) => {
+            const div = document.createElement('div');
+            div.className = 'input-group';
+            div.innerHTML = `
+                <label>Texto ${index + 1}:</label>
+                <input type="text" value="${t.contenido}" oninput="actualizarTexto(${index}, this.value)">
+            `;
+            contenedor.appendChild(div);
+        });
+
+        document.getElementById('titulo-diseno').innerText = data.nombre_diseño;
+
+    } catch (error) {
+        console.error("Error al cargar:", error);
+    }
+}
+
+        function actualizarTexto(index, nuevoValor) {
+            textos[index].contenido = nuevoValor;
+            draw();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Dibujar fondo
+            if (fondoImg.complete) {
+                ctx.drawImage(fondoImg, 0, 0, canvas.width, canvas.height);
+            }
+
+            // Dibujar textos con las mismas propiedades guardadas
+            textos.forEach(t => {
+                ctx.save();
+                
+                // Configuración de fuente y estilo
+                ctx.font = `bold ${t.size}px ${t.family}`;
+                ctx.textAlign = "left";
+                ctx.textBaseline = "top";
+
+                // Aplicar rotación si existe
+                const cx = t.x + (ctx.measureText(t.contenido).width / 2);
+                const cy = t.y + (t.size / 2);
+                if (t.angle) {
+                    ctx.translate(cx, cy);
+                    ctx.rotate(t.angle);
+                    ctx.translate(-cx, -cy);
+                }
+
+                // Sombra
+                ctx.shadowColor = t.sColor || 'transparent';
+                ctx.shadowBlur = t.sBlur || 0;
+                ctx.shadowOffsetX = t.sOffsetX || 0;
+                ctx.shadowOffsetY = t.sOffsetY || 0;
+
+                // Borde
+                if (t.bWidth > 0) {
+                    ctx.strokeStyle = t.bColor;
+                    ctx.lineWidth = t.bWidth;
+                    ctx.strokeText(t.contenido, t.x, t.y);
+                }
+
+                // Relleno
+                ctx.fillStyle = t.color;
+                ctx.fillText(t.contenido, t.x, t.y);
+                
+                ctx.restore();
+            });
+        }
+
+        function descargarTarjeta() {
+            const link = document.createElement('a');
+            link.download = `mi-tarjeta-${disenoId}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardStudio - Diseños Personalizados</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/landing.css"> <style>
+        :root { --primary: #ff4d29; --dark: #1a1a1a; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: #f4f4f4; }
+        
+        /* Navbar */
+        nav { background: white; padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { font-size: 1.8rem; font-weight: 700; color: var(--dark); text-decoration: none; }
+        .logo span { color: var(--primary); }
+
+        /* Hero */
+        .hero { text-align: center; padding: 100px 10%; background: var(--dark); color: white; }
+        .hero h1 { font-size: 3rem; margin: 0; }
+        .hero p { opacity: 0.8; max-width: 600px; margin: 20px auto; }
+
+        /* Grid de Diseños */
+        .container { padding: 50px 5%; }
+        .grid-diseños { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 30px; 
+        }
+
+        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); }
+        .card img { width: 100%; height: 350px; object-fit: cover; }
+        .card-info { padding: 15px; text-align: center; }
+        
+        .btn-go { 
+            background: var(--primary); color: white; text-decoration: none; 
+            padding: 10px 20px; border-radius: 5px; display: inline-block; font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#" class="logo">Card<span>Studio</span></a>
+        <a href="admin/login.html" style="text-decoration:none; color:var(--dark)">Admin</a>
+    </nav>
+
+    <header class="hero">
+        <h1>Crea Momentos Únicos</h1>
+        <p>Elige una plantilla profesional diseñada en CardStudio y personalízala con tus propios mensajes.</p>
+    </header>
+
+    <main class="container">
+        <h2 style="text-align:center; margin-bottom:40px;">Nuestras Plantillas</h2>
+        
+        <div id="galeria-disenos" class="grid-diseños">
+            <p style="text-align:center; grid-column: 1/-1;">Cargando diseños...</p>
+        </div>
+    </main>
+
+    <script>
+        // Función para cargar los diseños desde el servidor
+        async function cargarDisenos() {
+            try {
+                // Hacemos la petición al PHP
+                const response = await fetch('api_publica.php?action=list_designs');
+                const diseños = await response.json();
+                //console.log(diseños)
+                const contenedor = document.getElementById('galeria-disenos');
+                contenedor.innerHTML = ""; // Limpiar mensaje de carga
+
+                if(diseños.length === 0) {
+                    contenedor.innerHTML = "<p>No hay diseños disponibles por ahora.</p>";
+                    return;
+                }
+
+                diseños.forEach(d => {
+                    const html = `
+                        <div class="card">
+                            <img src="admin/${d.imagen_fondo_url}" alt="${d.nombre_diseño}">
+                            <div class="card-info">
+                                <h3>${d.nombre_diseño}</h3>
+                                <a href="editor_cliente.html?id=${d.id_diseño}" class="btn-go">Personalizar</a>
+                            </div>
+                        </div>
+                    `;
+                    contenedor.innerHTML += html;
+                });
+
+            } catch (error) {
+                console.error("Error cargando diseños:", error);
+                document.getElementById('galeria-disenos').innerHTML = "Error al conectar con el servidor.";
+            }
+        }
+
+        // Ejecutar al cargar la página
+        window.onload = cargarDisenos;
+    </script>
+</body>
+</html>
