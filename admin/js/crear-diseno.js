@@ -195,6 +195,17 @@ document.getElementById('btnGuardar').onclick = async () => {
         limpiarEditor(); // Limpia el lienzo tras guardar
     }
 };
+
+function actualizarNombreArchivo(input) {
+    const label = document.getElementById('nombre-archivo');
+    if (input.files && input.files.length > 0) {
+        label.innerText = "Archivo: " + input.files[0].name;
+    } else {
+        label.innerText = "Ningún archivo seleccionado";
+    }
+}
+
+
 function logout() {
     localStorage.removeItem('user_session');// ... (mismo código anterior de dibujo y selección)
     window.location.href = 'login.html';

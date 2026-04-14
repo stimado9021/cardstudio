@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editor Maestro - TarjetasStudio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lobster&family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Montserrat:wght@700&family=Open+Sans:wght@700&family=Playfair+Display:wght@700&family=Roboto:wght@700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/crear-diseno.css">
     <style>
         /* Estilos específicos para asegurar el scroll y la disposición */
@@ -34,7 +38,9 @@
             margin-bottom: 30px;
         }
 
-        .logo span { color: #ff4d29; }
+        .logo span {
+            color: #ff4d29;
+        }
 
         .config-panel {
             width: 350px;
@@ -47,7 +53,8 @@
 
         .config-scroll {
             padding: 20px;
-            overflow-y: auto; /* Activamos el scroll aquí */
+            overflow-y: auto;
+            /* Activamos el scroll aquí */
             height: 100%;
         }
 
@@ -62,7 +69,7 @@
 
         canvas {
             background: #fff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             cursor: default;
         }
 
@@ -79,7 +86,9 @@
             color: #444;
         }
 
-        input[type="text"], select, input[type="file"] {
+        input[type="text"],
+        select,
+        input[type="file"] {
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -104,7 +113,9 @@
             transition: background 0.3s;
         }
 
-        .btn-add:hover { background: #218838; }
+        .btn-add:hover {
+            background: #218838;
+        }
 
         .btn-save {
             background: #ff4d29;
@@ -119,17 +130,61 @@
             box-shadow: 0 4px 10px rgba(255, 77, 41, 0.3);
         }
 
-        .btn-save:hover { background: #e63e1c; }
+        .btn-save:hover {
+            background: #e63e1c;
+        }
 
-        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 20px 0;
+        }
 
         .dual-control {
             display: flex;
             gap: 10px;
             align-items: center;
         }
+
+        /* Contenedor principal */
+.custom-file-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+/* El botón falso */
+.btn-archivo {
+    background-color:black;
+    color: white;
+    border: 2px dashed #e30707;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btn-archivo:hover {
+    background-color: #f1e611;
+    border-color: var(--primary); /* El color naranja #ff4d29 */
+    color: var(--primary);
+}
+
+/* Texto del nombre del archivo */
+.file-name {
+    font-size: 0.8rem;
+    color: #888;
+    margin: 0;
+    font-style: italic;
+}
+
     </style>
 </head>
+
 <body>
 
     <div class="sidebar">
@@ -137,14 +192,15 @@
         <nav style="padding: 0 20px;">
             <div style="color: #888; font-size: 0.8rem; margin-bottom: 10px;">MENÚ</div>
             <div style="margin-bottom: 15px; cursor: pointer; color: #ff4d29;">🎨 Editor Maestro</div>
-            <div onclick="location.href='dashboard.php'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;">📁 Mis Diseños</div>
+            <div onclick="location.href='dashboard.php'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;">📁
+                Mis Diseños</div>
         </nav>
     </div>
 
     <div class="config-panel">
         <div class="config-scroll">
             <h3>General</h3>
-            
+
             <div class="control-group">
                 <label>Nombre del Diseño</label>
                 <input type="text" id="nombreDiseno" placeholder="Ej: Invitación Boda - Oro">
@@ -153,13 +209,24 @@
             <div class="control-group">
                 <label>Categoría</label>
                 <select id="categoriaSelect">
-                    </select>
+                </select>
             </div>
 
             <div class="control-group">
                 <label>Imagen de Fondo</label>
-                <input type="file" id="bgInput" accept="image/*">
+                <input type="file" id="bgInput" class="btn-archivo" accept="image/*">
             </div>
+            <!-- <div class="input-group">
+                <label>IMAGEN DE FONDO</label>
+                <div class="custom-file-upload">
+                    <label for="fondo-upload" class="btn-archivo">
+                        <span>📁 Seleccionar imagen</span>
+                    </label>
+                    <input type="file" id="bgInput" onchange="actualizarNombreArchivo(this)" accept="image/*"
+                        style="display: none;">
+                    <p id="nombre-archivo" class="file-name">Ningún archivo seleccionado</p>
+                </div>
+            </div> -->
 
             <button class="btn-add" onclick="añadirTexto()">+ Añadir Nueva Capa de Texto</button>
 
@@ -174,22 +241,28 @@
             </div>
 
             <div class="control-group">
-                <label>Fuente</label>
-                <select id="fontFamily" class="master-control">
+                <label>FUENTE</label>
+                <select id="fontFamily" onchange="cambiarFuente(this.value)" class="master-control">
                     <option value="Arial">Arial</option>
                     <option value="'Playfair Display', serif">Playfair Display</option>
-                    <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
+                    <option value="'Bebas Neue', cursive">Bebas Neue</option>
                     <option value="'Lobster', cursive">Lobster</option>
+                    <option value="'Montserrat', sans-serif">Montserrat</option>
+                    <option value="'Roboto', sans-serif">Roboto</option>
+                    <option value="'Lora', serif">Lora</option>
                 </select>
+
             </div>
 
             <div class="control-group">
                 <label>Tamaño y Ángulo</label>
                 <div class="dual-control">
-                    <span>A:</span> <input type="range" id="anguloInput" class="master-control" min="-3.14" max="3.14" step="0.05" title="Ángulo">
+                    <span>A:</span> <input type="range" id="anguloInput" class="master-control" min="-3.14" max="3.14"
+                        step="0.05" title="Ángulo">
                 </div>
                 <div class="dual-control">
-                    <span>T:</span> <input type="range" id="fontSize" class="master-control" min="10" max="250" value="50" title="Tamaño">
+                    <span>T:</span> <input type="range" id="fontSize" class="master-control" min="10" max="250"
+                        value="50" title="Tamaño">
                 </div>
             </div>
 
@@ -215,15 +288,18 @@
             <div class="control-group">
                 <label>Posición Sombra (X / Y)</label>
                 <div class="dual-control">
-                    <span>X:</span> <input type="range" id="shadowX" class="master-control" min="-30" max="30" value="5">
+                    <span>X:</span> <input type="range" id="shadowX" class="master-control" min="-30" max="30"
+                        value="5">
                 </div>
                 <div class="dual-control">
-                    <span>Y:</span> <input type="range" id="shadowY" class="master-control" min="-30" max="30" value="5">
+                    <span>Y:</span> <input type="range" id="shadowY" class="master-control" min="-30" max="30"
+                        value="5">
                 </div>
             </div>
 
             <button id="btnGuardar" class="btn-save">GUARDAR EN BASE DE DATOS</button>
-            <div style="height: 40px;"></div> </div>
+            <div style="height: 40px;"></div>
+        </div>
     </div>
 
     <div class="canvas-area">
@@ -232,4 +308,5 @@
 
     <script src="js/crear-diseno.js"></script>
 </body>
+
 </html>
