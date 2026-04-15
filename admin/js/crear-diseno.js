@@ -4,6 +4,7 @@ let fondoImg = new Image();
 let textos = []; 
 let seleccionadoIdx = null;
 let isDragging = false;
+let offset = { x: 0, y: 0 }; // Para un arrastre suave
 
 window.onload = async () => {
     // Cargar categorías dinámicas
@@ -39,7 +40,7 @@ function añadirTexto() {
     };
     textos.push(nuevo);
     seleccionadoIdx = textos.length - 1;
-    actualizarPanelControl(); // Sincroniza controles con el nuevo objeto
+    actualizarPanelControl();
     draw();
 }
 
@@ -47,7 +48,6 @@ function actualizarPanelControl() {
     if (seleccionadoIdx === null) return;
     const t = textos[seleccionadoIdx];
     
-    // El panel maestro adopta los valores del texto seleccionado
     document.getElementById('textoInput').value = t.contenido;
     document.getElementById('fontFamily').value = t.family;
     document.getElementById('fontSize').value = t.size;
@@ -80,22 +80,6 @@ function capturarCambios() {
     draw();
 }
 
-function limpiarEditor() {
-    textos = [];
-    seleccionadoIdx = null;
-    fondoImg = new Image();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Reset de formularios
-    document.getElementById('nombreDiseno').value = "";
-    document.getElementById('bgInput').value = "";
-    document.getElementById('textoInput').value = "Nuevo Texto";
-    document.getElementById('anguloInput').value = 0;
-    
-    alert("Editor reseteado. Listo para un nuevo diseño.");
-    draw();
-}
-
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (fondoImg.src) ctx.drawImage(fondoImg, 0, 0, canvas.width, canvas.height);
@@ -110,9 +94,10 @@ function draw() {
         const cy = t.y + t.height / 2;
 
         ctx.translate(cx, cy);
-        ctx.rotate(t.angle); // Control de ángulo integrado
+        ctx.rotate(t.angle);
         ctx.translate(-cx, -cy);
 
+        // Solo dibujamos el cuadro de selección si NO estamos exportando la imagen
         if (index === seleccionadoIdx) {
             ctx.strokeStyle = "#ff4d29";
             ctx.setLineDash([5, 5]);
@@ -139,7 +124,7 @@ function draw() {
     });
 }
 
-// Eventos de Mouse
+// Eventos de Mouse con mejora de precisión
 canvas.onmousedown = (e) => {
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
@@ -150,63 +135,86 @@ canvas.onmousedown = (e) => {
         if (mx >= t.x && mx <= t.x + t.width && my >= t.y && my <= t.y + t.height) {
             seleccionadoIdx = i;
             isDragging = true;
-            actualizarPanelControl(); // Recupera valores al seleccionar
+            offset.x = mx - t.x;
+            offset.y = my - t.y;
+            actualizarPanelControl();
             draw();
             return;
         }
     }
+    seleccionadoIdx = null;
+    draw();
 };
 
 canvas.onmousemove = (e) => {
     if (!isDragging || seleccionadoIdx === null) return;
     const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    
     const t = textos[seleccionadoIdx];
-    t.x = (e.clientX - rect.left) - (t.width / 2);
-    t.y = (e.clientY - rect.top) - (t.height / 2);
+    t.x = mx - offset.x;
+    t.y = my - offset.y;
     draw();
 };
 
 canvas.onmouseup = () => isDragging = false;
 
-// Registro de cambios en tiempo real
 document.querySelectorAll('.master-control').forEach(el => {
     el.addEventListener('input', capturarCambios);
 });
 
-// Carga de fondo
 document.getElementById('bgInput').onchange = (e) => {
     const reader = new FileReader();
     reader.onload = (ev) => { fondoImg.src = ev.target.result; fondoImg.onload = draw; };
     reader.readAsDataURL(e.target.files[0]);
 };
 
-// Guardar y Limpiar
+// --- GUARDADO CON GENERACIÓN DE JPG ---
 document.getElementById('btnGuardar').onclick = async () => {
+    const nombre = document.getElementById('nombreDiseno').value;
+    if(!nombre) { alert("Por favor, asigna un nombre al diseño."); return; }
+
+    // 1. Limpiamos selección para que la miniatura salga limpia
+    seleccionadoIdx = null;
+    draw();
+
+    // 2. Generamos el JPG del Canvas
+    const miniaturaBase64 = canvas.toDataURL('image/jpeg', 0.8);
+
     const formData = new FormData();
-    formData.append('nombre_diseno', document.getElementById('nombreDiseno').value);
+    formData.append('nombre_diseno', nombre);
     formData.append('id_categoria', document.getElementById('categoriaSelect').value);
     formData.append('imagen_fondo', document.getElementById('bgInput').files[0]);
     formData.append('config_json', JSON.stringify(textos));
+    formData.append('miniatura_base64', miniaturaBase64); // Enviamos el JPG
 
-    const res = await fetch('api.php?action=save_design', { method: 'POST', body: formData });
+    const res = await fetch('api.php?action=save_design', 
+    { 
+        method: 'POST',
+        body: formData 
+    });
     const data = await res.json();
+    
     if (data.success) {
-        alert("Guardado exitoso");
-        limpiarEditor(); // Limpia el lienzo tras guardar
+        alert("¡Diseño y JPG de vista previa guardados con éxito!");
+        limpiarEditor();
+    } else {
+        alert("Error al guardar: " + data.message);
     }
 };
 
-function actualizarNombreArchivo(input) {
-    const label = document.getElementById('nombre-archivo');
-    if (input.files && input.files.length > 0) {
-        label.innerText = "Archivo: " + input.files[0].name;
-    } else {
-        label.innerText = "Ningún archivo seleccionado";
-    }
+function limpiarEditor() {
+    textos = [];
+    seleccionadoIdx = null;
+    fondoImg = new Image();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.getElementById('nombreDiseno').value = "";
+    document.getElementById('bgInput').value = "";
+    draw();
 }
 
-
 function logout() {
-    localStorage.removeItem('user_session');// ... (mismo código anterior de dibujo y selección)
+    localStorage.removeItem('user_session');
     window.location.href = 'login.html';
 }

@@ -6,7 +6,7 @@ header('Content-Type: application/json');
 $action = $_GET['action'] ?? '';
 
 if ($action == 'list_designs') {
-    $query = "SELECT id_diseño, nombre_diseño, imagen_fondo_url FROM diseños ORDER BY id_diseño DESC";
+    $query = "SELECT id_diseño, nombre_diseño, imagen_fondo_url, miniatura_url, configuracion_textos_json FROM diseños ORDER BY id_diseño DESC";
     $res = mysqli_query($conn, $query);
    
     $diseños = [];
