@@ -73,7 +73,10 @@
                 </div>
             </div> -->
 
-            <button class="btn-add" onclick="añadirTexto()" data-i18n="admin_add_layer">+ Añadir Nueva Capa de Texto</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-add" style="flex: 1;" onclick="añadirTexto()" data-i18n="admin_add_layer">+ Añadir Línea</button>
+                <button class="btn-add" style="flex: 1; background-color: #555;" onclick="añadirParrafo()">+ Añadir Párrafo</button>
+            </div>
 
             <hr>
 
@@ -82,7 +85,8 @@
 
             <div class="control-group">
                 <label data-i18n="admin_text_content">Contenido del Texto</label>
-                <input type="text" id="textoInput" class="master-control" placeholder="Escribe aquí..." data-i18n-placeholder="admin_text_content">
+                <textarea id="textoInput" class="master-control" placeholder="Escribe aquí..." data-i18n-placeholder="admin_text_content" rows="3" style="width: 100%; border-radius: 5px; padding: 10px; background: #333; color: white; border: 1px solid #444; resize: vertical; font-family: inherit; font-size: 1rem;"></textarea>
+                <button onclick="eliminarCapa()" style="margin-top: 10px; width: 100%; background-color: #ff2a5f; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold;">🗑️ Eliminar este texto/párrafo</button>
             </div>
 
             <div class="control-group">
@@ -125,6 +129,22 @@
                     <span>T:</span> <input type="range" id="fontSize" class="master-control" min="10" max="250"
                         value="50" title="Tamaño">
                 </div>
+            </div>
+
+            <div class="control-group" id="groupMaxWidth" style="display: none;">
+                <label>Ancho del Párrafo</label>
+                <div class="dual-control">
+                    <span>W:</span> <input type="range" id="maxWidthInput" class="master-control" min="50" max="450" value="300" title="Ancho">
+                </div>
+            </div>
+
+            <div class="control-group" id="groupAlign" style="display: none;">
+                <label>Alineación (Párrafos)</label>
+                <select id="textAlign" class="master-control">
+                    <option value="left">Izquierda</option>
+                    <option value="center">Centro</option>
+                    <option value="right">Derecha</option>
+                </select>
             </div>
 
             <div class="control-group">

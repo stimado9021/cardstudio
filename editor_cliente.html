@@ -103,10 +103,17 @@
                 textos.forEach((t, index) => {
                     const div = document.createElement('div');
                     div.className = 'input-group';
-                    div.innerHTML = `
-                <label>${i18n.t('label_text')} ${index + 1}:</label>
-                <input type="text" value="${t.contenido}" oninput="actualizarTexto(${index}, this.value)">
-            `;
+                    if (t.type === 'paragraph') {
+                        div.innerHTML = `
+                            <label>${i18n.t('label_text')} ${index + 1}:</label>
+                            <textarea oninput="actualizarTexto(${index}, this.value)" rows="3" style="width: 100%; border-radius: 5px; padding: 10px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1); resize: vertical; font-family: inherit;">${t.contenido}</textarea>
+                        `;
+                    } else {
+                        div.innerHTML = `
+                            <label>${i18n.t('label_text')} ${index + 1}:</label>
+                            <input type="text" value="${t.contenido}" oninput="actualizarTexto(${index}, this.value)">
+                        `;
+                    }
                     contenedor.appendChild(div);
                 });
 
@@ -145,15 +152,48 @@
             textos.forEach(t => {
                 ctx.save();
                 ctx.font = `bold ${t.size}px ${t.family}`;
-                ctx.textAlign = "left";
+                
+                let lines = [];
+                let lineHeight = t.size * 1.2;
+                
+                if (t.type === 'paragraph') {
+                    let paragraphs = t.contenido.split('\n');
+                    for (let p of paragraphs) {
+                        let words = p.split(' ');
+                        let currentLine = '';
+                        for (let i = 0; i < words.length; i++) {
+                            let testLine = currentLine + words[i] + ' ';
+                            let metrics = ctx.measureText(testLine);
+                            if (metrics.width > t.maxWidth && i > 0) {
+                                lines.push(currentLine.trim());
+                                currentLine = words[i] + ' ';
+                            } else {
+                                currentLine = testLine;
+                            }
+                        }
+                        lines.push(currentLine.trim());
+                    }
+                    t.width = t.maxWidth;
+                    t.height = lines.length * lineHeight;
+                } else {
+                    lines = [t.contenido];
+                    const m = ctx.measureText(t.contenido);
+                    t.width = m.width; 
+                    t.height = t.size;
+                }
+
+                ctx.textAlign = t.align || "left";
                 ctx.textBaseline = "top";
-                const cx = t.x + (ctx.measureText(t.contenido).width / 2);
-                const cy = t.y + (t.size / 2);
+                
+                const cx = t.x + t.width / 2;
+                const cy = t.y + t.height / 2;
+                
                 if (t.angle) {
                     ctx.translate(cx, cy);
                     ctx.rotate(t.angle);
                     ctx.translate(-cx, -cy);
                 }
+                
                 if (t.hasShadow) {
                     ctx.shadowColor = t.sColor || 'transparent';
                     ctx.shadowBlur = t.sBlur || 0;
@@ -166,13 +206,26 @@
                     ctx.shadowOffsetY = 0;
                 }
 
-                if (t.hasBorder && t.bWidth > 0) {
-                    ctx.strokeStyle = t.bColor;
-                    ctx.lineWidth = t.bWidth;
-                    ctx.strokeText(t.contenido, t.x, t.y);
+                for (let i = 0; i < lines.length; i++) {
+                    let ly = t.y + (i * lineHeight);
+                    let lx = t.x;
+                    if (t.type === 'paragraph') {
+                        if (t.align === 'center') {
+                            lx = t.x + t.width / 2;
+                        } else if (t.align === 'right') {
+                            lx = t.x + t.width;
+                        }
+                    }
+                    
+                    if (t.hasBorder && t.bWidth > 0) {
+                        ctx.strokeStyle = t.bColor;
+                        ctx.lineWidth = t.bWidth;
+                        ctx.strokeText(lines[i], lx, ly);
+                    }
+                    ctx.fillStyle = t.color;
+                    ctx.fillText(lines[i], lx, ly);
                 }
-                ctx.fillStyle = t.color;
-                ctx.fillText(t.contenido, t.x, t.y);
+                
                 ctx.restore();
             });
 

@@ -62,12 +62,54 @@ function añadirTexto() {
         sColor: "#000000",
         sOffsetX: 5,
         sOffsetY: 5,
-        width: 0, height: 0
+        width: 0, height: 0,
+        type: 'normal'
     };
     textos.push(nuevo);
     seleccionadoIdx = textos.length - 1;
     actualizarPanelControl();
     draw();
+}
+
+function añadirParrafo() {
+    const nuevo = {
+        contenido: "Escribe tu dedicatoria o\npárrafo aquí...",
+        x: 100, y: 100 + (textos.length * 40),
+        size: 30,
+        family: "Arial",
+        color: "#ff4d29",
+        angle: 0,
+        hasBorder: false,
+        bColor: "#ffffff",
+        bWidth: 2,
+        hasShadow: false,
+        sBlur: 10,
+        sColor: "#000000",
+        sOffsetX: 5,
+        sOffsetY: 5,
+        width: 0, height: 0,
+        type: 'paragraph',
+        maxWidth: 300,
+        align: 'center'
+    };
+    textos.push(nuevo);
+    seleccionadoIdx = textos.length - 1;
+    actualizarPanelControl();
+    draw();
+}
+
+function eliminarCapa() {
+    if (seleccionadoIdx === null) return;
+    if (confirm("¿Estás seguro de que deseas eliminar este texto/párrafo?")) {
+        textos.splice(seleccionadoIdx, 1);
+        seleccionadoIdx = null;
+        draw();
+        
+        // Limpiar inputs
+        document.getElementById('textoInput').value = "";
+        document.getElementById('groupMaxWidth').style.display = 'none';
+        document.getElementById('groupAlign').style.display = 'none';
+    }
 }
 
 function actualizarPanelControl() {
@@ -87,6 +129,18 @@ function actualizarPanelControl() {
     document.getElementById('shadowBlur').value = t.sBlur;
     document.getElementById('shadowX').value = t.sOffsetX;
     document.getElementById('shadowY').value = t.sOffsetY;
+    
+    const groupMaxWidth = document.getElementById('groupMaxWidth');
+    const groupAlign = document.getElementById('groupAlign');
+    if (t.type === 'paragraph') {
+        groupMaxWidth.style.display = 'block';
+        groupAlign.style.display = 'block';
+        document.getElementById('maxWidthInput').value = t.maxWidth;
+        document.getElementById('textAlign').value = t.align || 'left';
+    } else {
+        groupMaxWidth.style.display = 'none';
+        groupAlign.style.display = 'none';
+    }
 }
 
 function capturarCambios() {
@@ -107,6 +161,11 @@ function capturarCambios() {
     t.sOffsetX = parseInt(document.getElementById('shadowX').value);
     t.sOffsetY = parseInt(document.getElementById('shadowY').value);
     
+    if (t.type === 'paragraph') {
+        t.maxWidth = parseInt(document.getElementById('maxWidthInput').value);
+        t.align = document.getElementById('textAlign').value;
+    }
+    
     draw();
 }
 
@@ -117,8 +176,35 @@ function draw() {
     textos.forEach((t, index) => {
         ctx.save();
         ctx.font = `bold ${t.size}px ${t.family}`;
-        const m = ctx.measureText(t.contenido);
-        t.width = m.width; t.height = t.size;
+        
+        let lines = [];
+        let lineHeight = t.size * 1.2;
+        
+        if (t.type === 'paragraph') {
+            let paragraphs = t.contenido.split('\n');
+            for (let p of paragraphs) {
+                let words = p.split(' ');
+                let currentLine = '';
+                for (let i = 0; i < words.length; i++) {
+                    let testLine = currentLine + words[i] + ' ';
+                    let metrics = ctx.measureText(testLine);
+                    if (metrics.width > t.maxWidth && i > 0) {
+                        lines.push(currentLine.trim());
+                        currentLine = words[i] + ' ';
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                lines.push(currentLine.trim());
+            }
+            t.width = t.maxWidth;
+            t.height = lines.length * lineHeight;
+        } else {
+            lines = [t.contenido];
+            const m = ctx.measureText(t.contenido);
+            t.width = m.width; 
+            t.height = t.size;
+        }
 
         const cx = t.x + t.width / 2;
         const cy = t.y + t.height / 2;
@@ -147,16 +233,29 @@ function draw() {
             ctx.shadowOffsetY = 0;
         }
 
-        ctx.textAlign = "left"; ctx.textBaseline = "top";
+        ctx.textAlign = t.align || "left"; 
+        ctx.textBaseline = "top";
 
-        if (t.hasBorder && t.bWidth > 0) {
-            ctx.strokeStyle = t.bColor;
-            ctx.lineWidth = t.bWidth;
-            ctx.strokeText(t.contenido, t.x, t.y);
+        for (let i = 0; i < lines.length; i++) {
+            let ly = t.y + (i * lineHeight);
+            let lx = t.x;
+            if (t.type === 'paragraph') {
+                if (t.align === 'center') {
+                    lx = t.x + t.width / 2;
+                } else if (t.align === 'right') {
+                    lx = t.x + t.width;
+                }
+            }
+            
+            if (t.hasBorder && t.bWidth > 0) {
+                ctx.strokeStyle = t.bColor;
+                ctx.lineWidth = t.bWidth;
+                ctx.strokeText(lines[i], lx, ly);
+            }
+            ctx.fillStyle = t.color;
+            ctx.fillText(lines[i], lx, ly);
         }
-
-        ctx.fillStyle = t.color;
-        ctx.fillText(t.contenido, t.x, t.y);
+        
         ctx.restore();
     });
 }
