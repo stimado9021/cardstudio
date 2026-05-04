@@ -1,0 +1,6 @@
+# Archivos de configuración
+config.php
+
+# Ignorar archivos temporales
+.DS_Store
+Thumbs.db

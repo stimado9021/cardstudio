@@ -6,16 +6,16 @@ header('Content-Type: application/json');
 
 
 
-    $query = "SELECT * FROM diseños ORDER BY id_diseño DESC";
-     var_dump($query);
+    $query = "SELECT * FROM disenos ORDER BY id_diseno DESC";
+     
     $res = mysqli_query($conn, $query);
-     var_dump($res);
-    $diseños = [];
+    
+    $disenos = [];
     while($row = mysqli_fetch_assoc($res)) {
-        $diseños[] = $row;
+        $disenos[] = $row;
     }
     
-    echo json_encode($diseños);
+    echo json_encode($disenos);
 
 
 

@@ -1,3 +1,4 @@
+<?php require_once 'auth_guard.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -7,213 +8,57 @@
     <title>Editor Maestro - TarjetasStudio</title>
 
     <link
-        href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Montserrat:wght@700&family=Open+Sans:wght@700&family=Playfair+Display:wght@700&family=Roboto:wght@700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Montserrat:wght@700&family=Open+Sans:wght@400;700&family=Playfair+Display:wght@700&family=Roboto:wght@700&family=Dancing+Script:wght@700&family=Pacifico&family=Cinzel:wght@700&family=Great+Vibes&family=Oswald:wght@700&family=Sacramento&family=Alex+Brush&family=Satisfy&family=Cormorant+Garamond:wght@700&family=Caveat:wght@700&family=Bebas+Neue&family=Lobster&display=swap"
         rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/adine-kirnberg" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/batman-forever" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/bauhaus-93" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/agent-orange" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/antiqua" rel="stylesheet">
     <link rel="stylesheet" href="css/crear-diseno.css">
-    <style>
-        /* Estilos específicos para asegurar el scroll y la disposición */
-        body {
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f2f5;
-        }
+    <script src="../js/i18n.js"></script>
 
-        .sidebar {
-            width: 200px;
-            background: #1a1a1a;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            padding: 20px 0;
-            flex-shrink: 0;
-        }
-
-        .logo {
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 30px;
-        }
-
-        .logo span {
-            color: #ff4d29;
-        }
-
-        .config-panel {
-            width: 350px;
-            background: white;
-            border-right: 1px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
-
-        .config-scroll {
-            padding: 20px;
-            overflow-y: auto;
-            /* Activamos el scroll aquí */
-            height: 100%;
-        }
-
-        .canvas-area {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            overflow: auto;
-        }
-
-        canvas {
-            background: #fff;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            cursor: default;
-        }
-
-        .control-group {
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .control-group label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #444;
-        }
-
-        input[type="text"],
-        select,
-        input[type="file"] {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            cursor: pointer;
-        }
-
-        .btn-add {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 5px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 20px;
-            transition: background 0.3s;
-        }
-
-        .btn-add:hover {
-            background: #218838;
-        }
-
-        .btn-save {
-            background: #ff4d29;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 5px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
-            box-shadow: 0 4px 10px rgba(255, 77, 41, 0.3);
-        }
-
-        .btn-save:hover {
-            background: #e63e1c;
-        }
-
-        hr {
-            border: 0;
-            border-top: 1px solid #eee;
-            margin: 20px 0;
-        }
-
-        .dual-control {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        /* Contenedor principal */
-.custom-file-upload {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 5px;
-}
-
-/* El botón falso */
-.btn-archivo {
-    background-color:black;
-    color: white;
-    border: 2px dashed #e30707;
-    padding: 12px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    text-align: center;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: inline-block;
-}
-
-.btn-archivo:hover {
-    background-color: #f1e611;
-    border-color: var(--primary); /* El color naranja #ff4d29 */
-    color: var(--primary);
-}
-
-/* Texto del nombre del archivo */
-.file-name {
-    font-size: 0.8rem;
-    color: #888;
-    margin: 0;
-    font-style: italic;
-}
-
-    </style>
 </head>
 
 <body>
 
     <div class="sidebar">
         <div class="logo">Tarjetas<span>Studio</span></div>
+        <div style="padding: 0 20px; margin-bottom: 15px;">
+            <script>document.write(i18n.createSwitcher())</script>
+        </div>
         <nav style="padding: 0 20px;">
-            <div style="color: #888; font-size: 0.8rem; margin-bottom: 10px;">MENÚ</div>
-            <div style="margin-bottom: 15px; cursor: pointer; color: #ff4d29;">🎨 Editor Maestro</div>
-            <div onclick="location.href='dashboard.php'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;">📁
-                Mis Diseños</div>
+            <div style="color: #888; font-size: 0.8rem; margin-bottom: 10px;" data-i18n="menu">MENÚ</div>
+            <div style="margin-bottom: 15px; cursor: pointer; color: #ff4d29;" data-i18n="menu_editor">🎨 Editor Maestro</div>
+            <div onclick="location.href='dashboard.html'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;" data-i18n="menu_designs">📁 Mis Diseños</div>
+            <div onclick="location.href='marketing.php'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;" data-i18n="menu_marketing">📧 Marketing Masivo</div>
+            <div onclick="logout()" style="cursor: pointer; opacity: 0.7; color:#ff4d29;" data-i18n="menu_logout">🚪 Cerrar sesión</div>
         </nav>
+    </div>
+
+    <!-- Tabs de navegación móvil (solo visible en pantallas pequeñas) -->
+    <div class="mobile-tabs">
+        <div class="mobile-tab active" id="tab-config" onclick="switchTab('config')" data-i18n="admin_tab_config">⚙️ Configuración</div>
+        <div class="mobile-tab" id="tab-canvas" onclick="switchTab('canvas')" data-i18n="admin_tab_canvas">🖼️ Lienzo</div>
     </div>
 
     <div class="config-panel">
         <div class="config-scroll">
-            <h3>General</h3>
+            <h3 data-i18n="admin_general">General</h3>
 
             <div class="control-group">
-                <label>Nombre del Diseño</label>
-                <input type="text" id="nombreDiseno" placeholder="Ej: Invitación Boda - Oro">
+                <label data-i18n="admin_design_name">Nombre del Diseño</label>
+                <input type="text" id="nombreDiseno" placeholder="Ej: Invitación Boda - Oro" data-i18n-placeholder="admin_design_name">
             </div>
 
             <div class="control-group">
-                <label>Categoría</label>
+                <label data-i18n="admin_category">Categoría</label>
                 <select id="categoriaSelect">
                 </select>
             </div>
 
             <div class="control-group">
-                <label>Imagen de Fondo</label>
+                <label data-i18n="admin_bg_image">Imagen de Fondo</label>
                 <input type="file" id="bgInput" class="btn-archivo" accept="image/*">
             </div>
             <!-- <div class="input-group">
@@ -228,20 +73,20 @@
                 </div>
             </div> -->
 
-            <button class="btn-add" onclick="añadirTexto()">+ Añadir Nueva Capa de Texto</button>
+            <button class="btn-add" onclick="añadirTexto()" data-i18n="admin_add_layer">+ Añadir Nueva Capa de Texto</button>
 
             <hr>
 
-            <h3>Control Maestro</h3>
-            <p style="font-size: 0.75rem; color: #888;">(Edita el texto seleccionado en el lienzo)</p>
+            <h3 data-i18n="admin_master_control">Control Maestro</h3>
+            <p style="font-size: 0.75rem; color: #888;" data-i18n="admin_master_hint">(Edita el texto seleccionado en el lienzo)</p>
 
             <div class="control-group">
-                <label>Contenido del Texto</label>
-                <input type="text" id="textoInput" class="master-control" placeholder="Escribe aquí...">
+                <label data-i18n="admin_text_content">Contenido del Texto</label>
+                <input type="text" id="textoInput" class="master-control" placeholder="Escribe aquí..." data-i18n-placeholder="admin_text_content">
             </div>
 
             <div class="control-group">
-                <label>FUENTE</label>
+                <label data-i18n="admin_font">FUENTE</label>
                 <select id="fontFamily" onchange="cambiarFuente(this.value)" class="master-control">
                     <option value="Arial">Arial</option>
                     <option value="'Playfair Display', serif">Playfair Display</option>
@@ -250,12 +95,28 @@
                     <option value="'Montserrat', sans-serif">Montserrat</option>
                     <option value="'Roboto', sans-serif">Roboto</option>
                     <option value="'Lora', serif">Lora</option>
+                    <option value="'Dancing Script', cursive">Dancing Script</option>
+                    <option value="'Pacifico', cursive">Pacifico</option>
+                    <option value="'Cinzel', serif">Cinzel</option>
+                    <option value="'Great Vibes', cursive">Great Vibes</option>
+                    <option value="'Oswald', sans-serif">Oswald</option>
+                    <option value="'Open Sans', sans-serif">Open Sans</option>
+                    <option value="'Sacramento', cursive">Sacramento</option>
+                    <option value="'Alex Brush', cursive">Alex Brush</option>
+                    <option value="'Satisfy', cursive">Satisfy</option>
+                    <option value="'Cormorant Garamond', serif">Cormorant Garamond</option>
+                    <option value="'Caveat', cursive">Caveat</option>
+                    <option value="'Adine Kirnberg', cursive">Adine Kirnberg</option>
+                    <option value="'Batman Forever Alternate', sans-serif">Batman Forever</option>
+                    <option value="'Bauhaus 93', sans-serif">Bauhaus 93</option>
+                    <option value="'Agent Orange', cursive">Agent Orange</option>
+                    <option value="'Antiqua', serif">Antigua</option>
                 </select>
 
             </div>
 
             <div class="control-group">
-                <label>Tamaño y Ángulo</label>
+                <label data-i18n="admin_size_angle">Tamaño y Ángulo</label>
                 <div class="dual-control">
                     <span>A:</span> <input type="range" id="anguloInput" class="master-control" min="-3.14" max="3.14"
                         step="0.05" title="Ángulo">
@@ -267,12 +128,16 @@
             </div>
 
             <div class="control-group">
-                <label>Color de Relleno</label>
+                <label data-i18n="admin_fill_color">Color de Relleno</label>
                 <input type="color" id="fontColor" class="master-control" value="#ff4d29">
             </div>
 
             <div class="control-group">
-                <label>Borde del Texto</label>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <input type="checkbox" id="checkBorder" class="master-control">
+                    <label style="margin:0;" data-i18n="admin_enable_border">Activar Borde</label>
+                </div>
+                <label data-i18n="admin_text_border">Borde del Texto</label>
                 <div class="dual-control">
                     <input type="color" id="borderColor" class="master-control" value="#ffffff">
                     <input type="range" id="borderWidth" class="master-control" min="0" max="15" step="0.5" value="2">
@@ -280,13 +145,17 @@
             </div>
 
             <div class="control-group">
-                <label>Sombra (Color y Difuminado)</label>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <input type="checkbox" id="checkShadow" class="master-control">
+                    <label style="margin:0;" data-i18n="admin_enable_shadow">Activar Sombra</label>
+                </div>
+                <label data-i18n="admin_shadow_blur">Sombra (Color y Difuminado)</label>
                 <input type="color" id="shadowColor" class="master-control" value="#000000">
                 <input type="range" id="shadowBlur" class="master-control" min="0" max="30" value="10">
             </div>
 
             <div class="control-group">
-                <label>Posición Sombra (X / Y)</label>
+                <label data-i18n="admin_shadow_pos">Posición Sombra (X / Y)</label>
                 <div class="dual-control">
                     <span>X:</span> <input type="range" id="shadowX" class="master-control" min="-30" max="30"
                         value="5">
@@ -297,7 +166,7 @@
                 </div>
             </div>
 
-            <button id="btnGuardar" class="btn-save">GUARDAR EN BASE DE DATOS</button>
+            <button id="btnGuardar" class="btn-save" data-i18n="admin_btn_save">GUARDAR EN BASE DE DATOS</button>
             <div style="height: 40px;"></div>
         </div>
     </div>
@@ -307,6 +176,39 @@
     </div>
 
     <script src="js/crear-diseno.js"></script>
+
+    <!-- Banner de recomendación escritorio (solo visible en móvil) -->
+    <div class="desktop-notice" id="desktopNotice">
+        <span data-i18n="admin_desktop_notice">💻 El Editor Maestro funciona mejor en una pantalla de escritorio.</span>
+        <button onclick="document.getElementById('desktopNotice').style.display='none'" data-i18n="btn_cancel">Entendido</button>
+    </div>
+
+    <script>
+        // Sistema de tabs para móvil
+        function switchTab(tab) {
+            const configPanel = document.querySelector('.config-panel');
+            const canvasArea  = document.querySelector('.canvas-area');
+            const tabConfig   = document.getElementById('tab-config');
+            const tabCanvas   = document.getElementById('tab-canvas');
+
+            if (tab === 'config') {
+                configPanel.classList.add('tab-active');
+                canvasArea.classList.remove('tab-active');
+                tabConfig.classList.add('active');
+                tabCanvas.classList.remove('active');
+            } else {
+                canvasArea.classList.add('tab-active');
+                configPanel.classList.remove('tab-active');
+                tabCanvas.classList.add('active');
+                tabConfig.classList.remove('active');
+            }
+        }
+
+        // En móvil, mostrar el panel de config por defecto al cargar
+        if (window.innerWidth <= 1024) {
+            document.querySelector('.config-panel').classList.add('tab-active');
+        }
+    </script>
 </body>
 
 </html>

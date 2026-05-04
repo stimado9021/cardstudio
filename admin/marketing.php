@@ -1,0 +1,318 @@
+<?php require_once 'auth_guard.php'; ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Masivo — CardStudio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff4d29;
+            --primary-glow: rgba(255, 77, 41, 0.3);
+            --bg: #0f0f11;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #fff;
+            --text-dim: #a1a1aa;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar similar to dashboard but styled better */
+        .sidebar {
+            width: 240px;
+            background: rgba(0, 0, 0, 0.3);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            flex-shrink: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .logo span { color: var(--primary); }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: var(--primary-glow);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        header {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 { font-size: 2rem; font-weight: 700; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(20px);
+        }
+
+        .stat-card .label { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 8px; }
+        .stat-card .value { font-size: 2rem; font-weight: 700; }
+
+        .composer {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            backdrop-filter: blur(20px);
+        }
+
+        .field { margin-bottom: 24px; }
+        .field label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .field input, .field textarea {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .field input:focus, .field textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        .field textarea { height: 300px; resize: none; }
+
+        .btn-send {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #ff4d29 0%, #ff2a5f 100%);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(255, 77, 41, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(255, 77, 41, 0.3);
+        }
+
+        .btn-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #statusMsg {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 12px;
+            display: none;
+            text-align: center;
+        }
+
+        .success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; }
+        .error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #fff;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">Card<span>Studio</span></div>
+        <nav>
+            <a href="dashboard.php" class="nav-item">📁 Mis Diseños</a>
+            <a href="crear-diseno.html" class="nav-item">🎨 Editor Maestro</a>
+            <a href="marketing.php" class="nav-item active">📧 Marketing Masivo</a>
+            <div onclick="logout()" class="nav-item" style="margin-top: auto; color: var(--primary)">🚪 Cerrar sesión</div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div>
+                <h1>📧 Marketing Masivo</h1>
+                <p style="color: var(--text-dim)">Envía campañas de correo a todos tus usuarios registrados.</p>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p class="label">Total Suscriptores</p>
+                <p class="value" id="subscriberCount">...</p>
+            </div>
+            <div class="stat-card">
+                <p class="label">Conexión Brevo</p>
+                <p class="value" style="color: #4ade80; font-size: 1.2rem;">🟢 Activa</p>
+            </div>
+        </div>
+
+        <div class="composer">
+            <div class="field">
+                <label for="subject">Asunto del Correo</label>
+                <input type="text" id="subject" placeholder="Ej: ¡Nueva colección de tarjetas de cumpleaños!">
+            </div>
+
+            <div class="field">
+                <label for="content">Contenido (HTML permitido)</label>
+                <div style="background: rgba(255, 77, 41, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.8rem; border: 1px dashed var(--primary);">
+                    💡 <strong>Variables disponibles:</strong> Usa <code>{{nombre}}</code> para el nombre del cliente y <code>{{email}}</code> para su correo.
+                </div>
+                <textarea id="content" placeholder="Escribe aquí tu mensaje... Puedes usar etiquetas HTML para diseño profesional."></textarea>
+            </div>
+
+            <button class="btn-send" id="btnSend" onclick="sendEmails()">
+                <span id="btnText">🚀 Enviar a todos</span>
+            </button>
+
+            <div id="statusMsg"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load stats
+        async function loadStats() {
+            try {
+                const res = await fetch('api_emails.php?action=get_stats');
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('subscriberCount').textContent = data.total_subscribers;
+                }
+            } catch (e) {
+                console.error("Error loading stats", e);
+            }
+        }
+
+        async function sendEmails() {
+            const subject = document.getElementById('subject').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const btn = document.getElementById('btnSend');
+            const status = document.getElementById('statusMsg');
+
+            if (!subject || !content) {
+                showStatus('Por favor, completa el asunto y el contenido.', 'error');
+                return;
+            }
+
+            if (!confirm('¿Estás seguro de enviar este correo a TODOS tus usuarios? Esta acción no se puede deshacer.')) {
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Enviando...';
+            status.style.display = 'none';
+
+            try {
+                const res = await fetch('api_emails.php?action=send_mass', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subject, content })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showStatus(`🎉 ¡Éxito! Se enviaron ${data.sent_count} de ${data.total_count} correos.`, 'success');
+                } else {
+                    showStatus('Error: ' + (data.error || 'Ocurrió un problema inesperado.'), 'error');
+                }
+            } catch (e) {
+                showStatus('Error de conexión con el servidor.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Enviar a todos';
+            }
+        }
+
+        function showStatus(msg, type) {
+            const status = document.getElementById('statusMsg');
+            status.textContent = msg;
+            status.className = type;
+            status.style.display = 'block';
+        }
+
+        async function logout() {
+            await fetch('api_admin_auth.php?action=logout');
+            window.location.href = '../index.html';
+        }
+
+        loadStats();
+    </script>
+</body>
+</html>

@@ -1,13 +1,10 @@
 <?php
 // admin/includes/db.php
 
-$servername = "localhost";
-$username = "root"; // Reemplaza con tu usuario
-$password = ""; // Reemplaza con tu contraseña
-$database = "cardstudio"; // Reemplaza con el nombre de tu base de datos
+require_once __DIR__ . '/../../config.php';
 
 // Crear la conexión
-$conn = mysqli_connect($servername, $username, $password, $database);
+$conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 // Verificar la conexión
 if (!$conn) {

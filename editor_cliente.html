@@ -6,114 +6,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personalizar mi Tarjeta - CardStudio</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Montserrat:wght@700&family=Open+Sans:wght@700&family=Playfair+Display:wght@700&family=Roboto:wght@700&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --primary: #ff4d29;
-            --dark: #1a1a1a;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            background: #222;
-            color: white;
-        }
-
-        .sidebar-cliente {
-            width: 350px;
-            background: #fff;
-            color: #333;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
-            z-index: 10;
-        }
-
-        .canvas-container {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: auto;
-            padding: 20px;
-        }
-
-        canvas {
-            background: white;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-            max-width: 100%;
-            height: auto;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #666;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-
-        .btn-download {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: auto;
-        }
-
-        .btn-back {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-    </style>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Montserrat:wght@700&family=Open+Sans:wght@400;700&family=Playfair+Display:wght@700&family=Roboto:wght@700&family=Dancing+Script:wght@700&family=Pacifico&family=Cinzel:wght@700&family=Great+Vibes&family=Oswald:wght@700&family=Sacramento&family=Alex+Brush&family=Satisfy&family=Cormorant+Garamond:wght@700&family=Caveat:wght@700&family=Bebas+Neue&family=Lobster&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/adine-kirnberg" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/batman-forever" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/bauhaus-93" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/agent-orange" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/antiqua" rel="stylesheet">
+    <link rel="stylesheet" href="css/editor_cliente.css">
+    <script src="js/i18n.js"></script>
+    <!-- PayPal SDK - Sandbox -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AWhDuHmBmFqAEMNoKy5IvsOVCWN322CdkQlcMppSopvSmihuXWIT6iSA1m7ObWPlH9hzaHEVTm7ixMiu&currency=USD"></script>
 </head>
 
 <body>
 
     <div class="sidebar-cliente">
-        <a href="index.html" class="btn-back">← Volver a Galería</a>
-        <h2 id="titulo-diseno">Personaliza tu diseño</h2>
-        <p style="font-size: 0.85rem; color: #888; margin-bottom: 30px;">Escribe en los campos de abajo para actualizar
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <a href="index.html" class="btn-back" data-i18n="btn_back">← Volver a Galería</a>
+            <script>document.write(i18n.createSwitcher())</script>
+        </div>
+        <h2 id="titulo-diseno" data-i18n="editor_title">Personaliza tu diseño</h2>
+        <p style="font-size: 0.85rem; color: #888; margin-bottom: 30px;" data-i18n="editor_subtitle">Escribe en los campos de abajo para actualizar
             la tarjeta en tiempo real.</p>
 
         <div id="controles-dinamicos"></div>
 
-        <button class="btn-download" onclick="descargarTarjeta()">📥 DESCARGAR TARJETA</button>
+        <button class="btn-download" onclick="descargarTarjeta()" data-i18n="btn_download">📥 DESCARGAR TARJETA</button>
     </div>
 
     <div class="canvas-container">
         <canvas id="clienteCanvas" width="500" height="700"></canvas>
+    </div>
+
+    <!-- Modal Login -->
+    <div id="modalLogin" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center;">
+        <div style="background:var(--sidebar-bg); padding:40px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); width:300px; text-align:center;">
+            <h3 style="margin-top:0;" data-i18n="modal_login_title">Iniciar Sesión</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted);" data-i18n="modal_login_text">Para descargar tu tarjeta, ingresa a tu cuenta. Si no tienes una, se creará automáticamente.</p>
+            <input type="email" id="loginEmail" placeholder="Email" data-i18n="placeholder_email" style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:white; box-sizing:border-box;">
+            <input type="password" id="loginPassword" placeholder="Contraseña" data-i18n="placeholder_password" style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:white; box-sizing:border-box;">
+            <button onclick="login()" style="width:100%; padding:12px; background:linear-gradient(90deg, var(--primary), var(--primary-hover)); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;" data-i18n="btn_login">Entrar / Registrarse</button>
+            <button onclick="document.getElementById('modalLogin').style.display='none'" style="margin-top:15px; background:none; border:none; color:var(--text-muted); cursor:pointer;" data-i18n="btn_cancel">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Modal Pago -->
+    <div id="modalPago" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center;">
+        <div style="background:#1a1a1d; padding:40px; border-radius:20px; border:1px solid rgba(255,255,255,0.08); width:380px; text-align:center; box-shadow:0 30px 60px rgba(0,0,0,0.6);">
+            <div style="font-size:2.5rem; margin-bottom:10px;">🎉</div>
+            <h3 style="margin-top:0; font-size:1.4rem;" data-i18n="modal_pay_title">¡Tu diseño está listo!</h3>
+            <p style="font-size:0.9rem; color:#a1a1aa; margin-bottom:5px;" data-i18n="modal_pay_text">Descárgalo sin marca de agua por solo:</p>
+            <div style="font-size:3.5rem; font-weight:800; color:#ff4d29; margin:10px 0; line-height:1;">$1.00 <span style="font-size:1.2rem; color:#a1a1aa;" data-i18n="currency_usd">USD</span></div>
+            <p style="font-size:0.8rem; color:#666; margin-bottom:25px;" data-i18n="pay_footer">Pago único · Descarga inmediata · Sin suscripción</p>
+            <!-- Contenedor de los botones reales de PayPal -->
+            <div id="paypal-button-container" style="min-height:50px;"></div>
+            <button onclick="document.getElementById('modalPago').style.display='none'" style="margin-top:20px; background:none; border:none; color:#666; cursor:pointer; font-size:0.85rem;" data-i18n="btn_cancel">✕ Cancelar</button>
+        </div>
     </div>
 
     <script>
@@ -121,51 +71,63 @@
         const ctx = canvas.getContext('2d');
         const params = new URLSearchParams(window.location.search);
         const disenoId = params.get('id');
-console.log(disenoId);
         let fondoImg = new Image();
         let textos = [];
 
+        let isLoggedIn = false;
+        let hasPaid = false;
+        let paypalButtonsInstance = null; // Para controlar los botones de PayPal
+
         async function init() {
-            if (!disenoId) return alert("No se seleccionó ningún diseño");
+            if (!disenoId) return alert(i18n.t("alert_no_design"));
+
+            await checkAuthStatus();
 
             try {
                 const response = await fetch(`api_publica.php?action=get_design_details&id=${disenoId}`);
                 const data = await response.json();
-                console.log("Datos recibidos:", data); // Verifica que los nombres coincidan aquí
 
                 // 1. Cargar imagen de fondo
                 fondoImg.src = `admin/${data.imagen_fondo_url}`;
                 fondoImg.onload = () => draw();
 
-                // 2. CORRECCIÓN: Usar el nombre exacto de la columna de tu DB
-                // Según tu consola es 'configuracion_textos_json'
+                // 2. Parsear configuración de textos
                 const jsonRaw = data.configuracion_textos_json || data.config_json;
-
                 if (jsonRaw) {
                     textos = JSON.parse(jsonRaw);
-                } else {
-                    console.error("No se encontró la configuración de textos en el JSON");
                 }
 
                 // 3. Crear inputs para cada texto
                 const contenedor = document.getElementById('controles-dinamicos');
-                contenedor.innerHTML = ""; // Limpiar antes de llenar
-
+                contenedor.innerHTML = "";
                 textos.forEach((t, index) => {
                     const div = document.createElement('div');
                     div.className = 'input-group';
                     div.innerHTML = `
-                <label>Texto ${index + 1}:</label>
+                <label>${i18n.t('label_text')} ${index + 1}:</label>
                 <input type="text" value="${t.contenido}" oninput="actualizarTexto(${index}, this.value)">
             `;
                     contenedor.appendChild(div);
                 });
 
-                document.getElementById('titulo-diseno').innerText = data.nombre_diseño;
+                document.getElementById('titulo-diseno').innerText = data.nombre_diseno;
 
             } catch (error) {
                 console.error("Error al cargar:", error);
             }
+        }
+
+        async function checkAuthStatus() {
+            try {
+                let res = await fetch('api_auth.php?action=check');
+                let data = await res.json();
+                isLoggedIn = data.logged_in;
+                if (isLoggedIn) {
+                    let resPago = await fetch(`api_pagos.php?action=check&diseno_id=${disenoId}`);
+                    let dataPago = await resPago.json();
+                    hasPaid = dataPago.has_paid;
+                }
+            } catch(e) { console.error(e); }
         }
 
         function actualizarTexto(index, nuevoValor) {
@@ -176,21 +138,15 @@ console.log(disenoId);
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dibujar fondo
             if (fondoImg.complete) {
                 ctx.drawImage(fondoImg, 0, 0, canvas.width, canvas.height);
             }
 
-            // Dibujar textos con las mismas propiedades guardadas
             textos.forEach(t => {
                 ctx.save();
-
-                // Configuración de fuente y estilo
                 ctx.font = `bold ${t.size}px ${t.family}`;
                 ctx.textAlign = "left";
                 ctx.textBaseline = "top";
-
-                // Aplicar rotación si existe
                 const cx = t.x + (ctx.measureText(t.contenido).width / 2);
                 const cy = t.y + (t.size / 2);
                 if (t.angle) {
@@ -198,33 +154,169 @@ console.log(disenoId);
                     ctx.rotate(t.angle);
                     ctx.translate(-cx, -cy);
                 }
+                if (t.hasShadow) {
+                    ctx.shadowColor = t.sColor || 'transparent';
+                    ctx.shadowBlur = t.sBlur || 0;
+                    ctx.shadowOffsetX = t.sOffsetX || 0;
+                    ctx.shadowOffsetY = t.sOffsetY || 0;
+                } else {
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                }
 
-                // Sombra
-                ctx.shadowColor = t.sColor || 'transparent';
-                ctx.shadowBlur = t.sBlur || 0;
-                ctx.shadowOffsetX = t.sOffsetX || 0;
-                ctx.shadowOffsetY = t.sOffsetY || 0;
-
-                // Borde
-                if (t.bWidth > 0) {
+                if (t.hasBorder && t.bWidth > 0) {
                     ctx.strokeStyle = t.bColor;
                     ctx.lineWidth = t.bWidth;
                     ctx.strokeText(t.contenido, t.x, t.y);
                 }
-
-                // Relleno
                 ctx.fillStyle = t.color;
                 ctx.fillText(t.contenido, t.x, t.y);
-
                 ctx.restore();
             });
+
+            // Marca de agua si no ha pagado
+            if (!hasPaid) {
+                ctx.save();
+                ctx.font = "bold 48px Poppins";
+                ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(-Math.PI / 4);
+                for(let i = -2; i <= 2; i++) {
+                    for(let j = -2; j <= 2; j++) {
+                        ctx.fillText("PREVIEW", i * 200, j * 150);
+                    }
+                }
+                ctx.restore();
+            }
         }
 
         function descargarTarjeta() {
+            if (!isLoggedIn) { mostrarModalLogin(); return; }
+            if (!hasPaid)    { mostrarModalPago();  return; }
+
             const link = document.createElement('a');
             link.download = `mi-tarjeta-${disenoId}.png`;
             link.href = canvas.toDataURL("image/png");
             link.click();
+        }
+
+        function mostrarModalLogin() {
+            document.getElementById('modalLogin').style.display = 'flex';
+        }
+
+        function mostrarModalPago() {
+            document.getElementById('modalPago').style.display = 'flex';
+            renderizarBotonesPayPal();
+        }
+
+        function renderizarBotonesPayPal() {
+            const container = document.getElementById('paypal-button-container');
+            container.innerHTML = ''; // Limpiar botones previos
+
+            if (typeof paypal === 'undefined') {
+                container.innerHTML = `<p style="color:#f44;font-size:0.85rem;">${i18n.t('error_paypal_sdk')}</p>`;
+                return;
+            }
+
+            paypal.Buttons({
+                style: {
+                    layout: 'vertical',
+                    color:  'gold',
+                    shape:  'pill',
+                    label:  'pay'
+                },
+
+                // 1. Crear la orden en PayPal (monto $1.00 USD)
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            description: `CardStudio - Invitación #${disenoId}`,
+                            amount: {
+                                currency_code: 'USD',
+                                value: '1.00'
+                            }
+                        }]
+                    });
+                },
+
+                // 2. El usuario aprobó el pago → verificar en el servidor
+                onApprove: async function(data, actions) {
+                    container.innerHTML = `<p style="color:#a1a1aa; font-size:0.9rem;">${i18n.t('verifying_payment')}</p>`;
+                    try {
+                        const res = await fetch('api_pagos.php?action=capture', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                orderID:   data.orderID,
+                                diseno_id: disenoId
+                            })
+                        });
+                        const result = await res.json();
+
+                        if (result.success) {
+                            hasPaid = true;
+                            document.getElementById('modalPago').style.display = 'none';
+                            draw(); // Redibujar sin marca de agua
+                            setTimeout(descargarTarjeta, 300);
+                        } else {
+                            container.innerHTML = `<p style="color:#f44;">${i18n.t('error_prefix')} ${result.error}</p>`;
+                        }
+                    } catch(e) {
+                        container.innerHTML = `<p style="color:#f44;">${i18n.t('error_connection')}</p>`;
+                    }
+                },
+
+                onError: function(err) {
+                    console.error('PayPal Error:', err);
+                    container.innerHTML = `<p style="color:#f44;">${i18n.t('error_paypal_generic')}</p>`;
+                },
+
+                onCancel: function() {
+                    // El usuario canceló, no hacer nada
+                }
+            }).render('#paypal-button-container');
+        }
+
+        async function login() {
+            let email = document.getElementById('loginEmail').value;
+            let pwd   = document.getElementById('loginPassword').value;
+            if(!email || !pwd) return alert(i18n.t("alert_login_required"));
+
+            let res = await fetch('api_auth.php?action=login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email: email, password: pwd})
+            });
+            let data = await res.json();
+
+            if(data.success) {
+                document.getElementById('modalLogin').style.display = 'none';
+                await checkAuthStatus();
+                if(hasPaid) { draw(); descargarTarjeta(); } else { mostrarModalPago(); }
+            } else {
+                // Si no existe, registrarlo automáticamente
+                if(data.error === 'Usuario no encontrado') {
+                    let regRes = await fetch('api_auth.php?action=register', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({email: email, password: pwd})
+                    });
+                    let regData = await regRes.json();
+                    if(regData.success) {
+                        document.getElementById('modalLogin').style.display = 'none';
+                        await checkAuthStatus();
+                        mostrarModalPago();
+                    } else {
+                        alert(regData.error);
+                    }
+                } else {
+                    alert(data.error);
+                }
+            }
         }
 
         window.onload = init;
