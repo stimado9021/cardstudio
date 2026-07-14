@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis CardStudio - Plan de Optimización</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --red: #ff4d29;
+            --red-dark: #e63e1f;
+            --dark: #0f0f11;
+            --dark-card: #1a1a1e;
+            --dark-border: #2a2a2e;
+            --text: #e4e4e7;
+            --text-muted: #a1a1aa;
+            --green: #22c55e;
+            --yellow: #eab308;
+            --orange: #f97316;
+            --blue: #3b82f6;
+            --purple: #a855f7;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #fafafa;
+            color: #1a1a1e;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .page {
+            max-width: 210mm;
+            margin: 0 auto;
+            background: white;
+            padding: 40px 50px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+        }
+
+        @media print {
+            body { background: white; }
+            .page {
+                margin: 0;
+                padding: 20px 30px;
+                box-shadow: none;
+                max-width: 100%;
+            }
+            .page-break { page-break-before: always; }
+            .no-print { display: none !important; }
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 30px;
+            border-bottom: 3px solid var(--red);
+            margin-bottom: 35px;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        .header h1 span { color: var(--red); }
+        .header .subtitle {
+            font-size: 16px;
+            color: #666;
+            font-weight: 400;
+        }
+        .header .date {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 1000;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 12px rgba(255,77,41,0.4);
+            transition: background 0.2s;
+        }
+        .print-btn:hover { background: var(--red-dark); }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 30px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--dark-border);
+        }
+
+        h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin: 20px 0 10px 0;
+        }
+
+        h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin: 15px 0 8px 0;
+        }
+
+        p { margin-bottom: 10px; color: #444; }
+
+        .exec-summary {
+            background: linear-gradient(135deg, #fef2f2, #fff7ed);
+            border: 1px solid #fecaca;
+            border-left: 4px solid var(--red);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .exec-summary h3 {
+            color: var(--red-dark);
+            margin-top: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: var(--dark);
+            color: white;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: 800;
+            display: block;
+        }
+        .stat-card .label {
+            font-size: 11px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-card.critical .number { color: #ef4444; }
+        .stat-card.high .number { color: var(--orange); }
+        .stat-card.medium .number { color: var(--yellow); }
+        .stat-card.low .number { color: var(--blue); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 12.5px;
+        }
+        th {
+            background: var(--dark);
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        th:first-child { border-radius: 6px 0 0 0; }
+        th:last-child { border-radius: 0 6px 0 0; }
+        td {
+            padding: 9px 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        tr:hover td { background: #f9f9f9; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-critical { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .badge-high { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+        .badge-medium { background: #fefce8; color: #ca8a04; border: 1px solid #fef08a; }
+        .badge-low { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+
+        code {
+            background: #f4f4f5;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            color: #dc2626;
+        }
+        .code-block {
+            background: #1a1a1e;
+            color: #e4e4e7;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 11.5px;
+            line-height: 1.5;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        .code-block .comment { color: #6b7280; }
+        .code-block .danger { color: #fca5a5; background: rgba(239,68,68,0.1); display: inline; }
+
+        .vuln-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin: 10px 0;
+            background: #fafafa;
+        }
+        .vuln-card.critical { border-left: 4px solid #dc2626; background: #fef2f2; }
+        .vuln-card.high { border-left: 4px solid #ea580c; background: #fff7ed; }
+        .vuln-card.medium { border-left: 4px solid #ca8a04; background: #fefce8; }
+        .vuln-card.low { border-left: 4px solid #2563eb; background: #eff6ff; }
+        .vuln-card .vuln-title {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        .vuln-card .vuln-meta {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+        .vuln-card .vuln-desc { font-size: 12.5px; color: #444; }
+
+        .phase {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            margin: 18px 0;
+            overflow: hidden;
+        }
+        .phase-header {
+            padding: 14px 18px;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .phase-header .time {
+            font-size: 12px;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+        .phase-body { padding: 14px 18px; }
+
+        .phase-0 .phase-header { background: #fef2f2; color: #991b1b; border-bottom: 1px solid #fecaca; }
+        .phase-1 .phase-header { background: #fff7ed; color: #9a3412; border-bottom: 1px solid #fed7aa; }
+        .phase-2 .phase-header { background: #fefce8; color: #854d0e; border-bottom: 1px solid #fef08a; }
+        .phase-3 .phase-header { background: #f0fdf4; color: #166534; border-bottom: 1px solid #bbf7d0; }
+        .phase-4 .phase-header { background: #eff6ff; color: #1e40af; border-bottom: 1px solid #bfdbfe; }
+        .phase-5 .phase-header { background: #faf5ff; color: #6b21a8; border-bottom: 1px solid #e9d5ff; }
+        .phase-6 .phase-header { background: #f0f9ff; color: #075985; border-bottom: 1px solid #bae6fd; }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .col-box {
+            background: #f9f9f9;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 14px;
+        }
+        .col-box h4 { margin-top: 0; font-size: 13px; }
+        .col-box ul { padding-left: 18px; font-size: 12.5px; }
+        .col-box li { margin-bottom: 4px; }
+
+        .attack-path {
+            background: #1a1a1e;
+            color: #e4e4e7;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 12px;
+            line-height: 1.8;
+            white-space: pre;
+        }
+        .attack-path .step { color: #fca5a5; }
+        .attack-path .arrow { color: #6b7280; }
+        .attack-path .result { color: #86efac; font-weight: 700; }
+
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid var(--blue);
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        .warning-box {
+            background: #fefce8;
+            border: 1px solid #fef08a;
+            border-left: 4px solid var(--yellow);
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        .footer {
+            text-align: center;
+            padding-top: 25px;
+            margin-top: 30px;
+            border-top: 2px solid #eee;
+            font-size: 11px;
+            color: #999;
+        }
+
+        .toc {
+            background: #f9f9f9;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 18px 22px;
+            margin: 20px 0;
+        }
+        .toc h3 { margin-top: 0; margin-bottom: 10px; }
+        .toc ol { padding-left: 22px; font-size: 13px; }
+        .toc li { margin-bottom: 4px; }
+        .toc a { color: var(--red); text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+
+        ul, ol { padding-left: 20px; }
+        li { margin-bottom: 5px; font-size: 13px; line-height: 1.5; }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .timeline-date {
+            min-width: 120px;
+            text-align: right;
+            padding-right: 20px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .timeline-line {
+            width: 3px;
+            min-height: 60px;
+            margin: 0 15px;
+            border-radius: 2px;
+        }
+        .timeline-content { font-size: 13px; }
+        .timeline-content strong { display: block; margin-bottom: 2px; }
+    </style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">Guardar como PDF</button>
+
+<div class="page">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>Analisis <span>Card</span>Studio</h1>
+        <div class="subtitle">Plan de Optimizacion y Escalabilidad</div>
+        <div class="date">Generado: Julio 14, 2026 | Stack: PHP + JavaScript Vanilla + MySQL</div>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc">
+        <h3>Contenido</h3>
+        <ol>
+            <li><a href="#resumen">Resumen Ejecutivo</a></li>
+            <li><a href="#seguridad">Analisis de Seguridad</a></li>
+            <li><a href="#arquitectura">Analisis de Arquitectura</a></li>
+            <li><a href="#frontend">Analisis de Frontend y UX</a></li>
+            <li><a href="#plan">Plan de Accion por Fases</a></li>
+            <li><a href="#timeline">Timeline Estimado</a></li>
+        </ol>
+    </div>
+
+    <!-- 1. RESUMEN EJECUTIVO -->
+    <div id="resumen">
+        <h2>1. Resumen Ejecutivo</h2>
+
+        <div class="stats-grid">
+            <div class="stat-card critical">
+                <span class="number">5</span>
+                <span class="label">Criticas</span>
+            </div>
+            <div class="stat-card high">
+                <span class="number">8</span>
+                <span class="label">Alta</span>
+            </div>
+            <div class="stat-card medium">
+                <span class="number">6</span>
+                <span class="label">Media</span>
+            </div>
+            <div class="stat-card low">
+                <span class="number">3</span>
+                <span class="label">Baja</span>
+            </div>
+        </div>
+
+        <div class="exec-summary">
+            <h3>Hallazgo Mas Critico</h3>
+            <p>El sistema tiene <strong>dos backdoors de acceso admin</strong> funcionales y publicamente accesibles:</p>
+            <div class="two-col">
+                <div class="col-box" style="border-color: #fecaca;">
+                    <h4>Backdoor #1</h4>
+                    <p><code>admin/api.php?action=login</code></p>
+                    <p>Usuario: <strong>admin</strong> | Password: <strong>1234</strong> (texto plano)</p>
+                </div>
+                <div class="col-box" style="border-color: #fecaca;">
+                    <h4>Backdoor #2</h4>
+                    <p><code>api_admin_auth.php?action=login</code></p>
+                    <p>Usuario: <strong>admin</strong> | Password: <strong>cardstudio2025</strong> (en codigo fuente)</p>
+                </div>
+            </div>
+            <p style="margin-top:10px; font-weight:600; color:#991b1b;">Ruta de ataque completa para ejecucion remota de codigo (RCE):</p>
+        </div>
+
+        <div class="attack-path"><span class="step">PASO 1:</span> POST admin/api.php?action=login  (user=admin&amp;pass=1234)
+  <span class="arrow">-&gt;</span> Respuesta: {"success": true}
+
+<span class="step">PASO 2:</span> POST admin/api.php?action=save_design  (imagen_fondo=@webshell.php)
+  <span class="arrow">-&gt;</span> Archivo guardado: uploads/fondo_abc123.php
+
+<span class="step">PASO 3:</span> GET admin/uploads/fondo_abc123.php
+  <span class="arrow">-&gt;</span> <span class="result">CODIGO PHP EJECUTADO EN EL SERVIDOR</span></div>
+
+        <p><strong>Resumen del stack actual:</strong> PHP vanilla sin framework, JavaScript vanilla sin modularizacion, MySQL con queries inline, zero tests, zero CI/CD, zero dependencias (sin Composer/npm).</p>
+    </div>
+
+    <!-- 2. SEGURIDAD -->
+    <div id="seguridad" class="page-break">
+        <h2>2. Analisis de Seguridad</h2>
+
+        <h3>2.1 Vulnerabilidades Criticas</h3>
+
+        <div class="vuln-card critical">
+            <div class="vuln-title">C1. Credenciales Admin Hardcodeadas</div>
+            <div class="vuln-meta">admin/api_admin_auth.php:14-15 | Hardcoded Credentials</div>
+            <div class="vuln-desc">
+                La contrasena <code>cardstudio2025</code> esta en texto plano en el codigo fuente. Aunque se aplica <code>password_hash()</code>, el valor original es visible para cualquiera que lea el archivo. El hash se recalcula en cada peticion HTTP (desperdicio de CPU).
+            </div>
+        </div>
+
+        <div class="vuln-card critical">
+            <div class="vuln-title">C2. Backdoor de Login Admin con Credenciales en Texto Plano</div>
+            <div class="vuln-meta">admin/api.php:10-18 | Authentication Bypass</div>
+            <div class="vuln-desc">
+                Segundo sistema de autenticacion completamente separado. Usa comparacion directa <code>==</code> con credenciales triviales: <code>admin/1234</code>. No usa sesiones, no usa hashing, no tiene rate limiting.
+            </div>
+        </div>
+
+        <div class="vuln-card critical">
+            <div class="vuln-title">C3. API Publica Sin Autenticacion</div>
+            <div class="vuln-meta">api_publica.php:1-28 | Broken Access Control</div>
+            <div class="vuln-desc">
+                Expone la tabla <code>disenos</code> completa incluyendo <code>configuracion_textos_json</code> con <code>SELECT *</code>. Cualquiera puede listar todos los disenos y ver su configuracion interna.
+            </div>
+        </div>
+
+        <div class="vuln-card critical">
+            <div class="vuln-title">C4. Exposicion de Errores de Base de Datos</div>
+            <div class="vuln-meta">admin/api.php:119,134 | Information Disclosure</div>
+            <div class="vuln-desc">
+                Los mensajes de error de MySQL se retornan directamente al cliente en JSON, revelando estructura de tablas, columnas y queries.
+            </div>
+        </div>
+
+        <div class="vuln-card critical">
+            <div class="vuln-title">C5. Sin Autenticacion para CRUD Completo</div>
+            <div class="vuln-meta">admin/api.php:1-138 | Missing Authentication</div>
+            <div class="vuln-desc">
+                Este archivo contiene operaciones CRUD (crear, editar, subir archivos) y <strong>NO tiene ninguna verificacion de sesion</strong>. Cualquiera puede crear/modificar disenos y subir archivos al servidor.
+            </div>
+        </div>
+
+        <h3>2.2 Vulnerabilidades de Alta Severidad</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Archivo</th>
+                    <th>Linea</th>
+                    <th>Tipo</th>
+                    <th>Severidad</th>
+                    <th>Descripcion</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>A1</td>
+                    <td><code>api_auth.php</code></td>
+                    <td>13-35</td>
+                    <td>SQL Injection</td>
+                    <td><span class="badge badge-high">Alta</span></td>
+                    <td>Uso de <code>mysqli_real_escape_string</code> en vez de prepared statements</td>
+                </tr>
+                <tr>
+                    <td>A2</td>
+                    <td><code>api_emails.php</code></td>
+                    <td>30-57</td>
+                    <td>HTML Injection</td>
+                    <td><span class="badge badge-high">Alta</span></td>
+                    <td>Contenido de email sin sanitizar, permite inyeccion HTML/JS en emails masivos</td>
+                </tr>
+                <tr>
+                    <td>A3</td>
+                    <td><code>admin/api.php</code></td>
+                    <td>65-91</td>
+                    <td>Unrestricted Upload</td>
+                    <td><span class="badge badge-high">Alta</span></td>
+                    <td>Sin validacion MIME/extension. Permite subir <code>.php</code> renombrado como imagen</td>
+                </tr>
+                <tr>
+                    <td>A4</td>
+                    <td><code>admin/api.php</code></td>
+                    <td>51-56</td>
+                    <td>Permisos Inseguros</td>
+                    <td><span class="badge badge-high">Alta</span></td>
+                    <td>Directorio <code>uploads/</code> creado con permisos <code>0777</code></td>
+                </tr>
+                <tr>
+                    <td>A5</td>
+                    <td><code>api_pagos.php</code></td>
+                    <td>6-7</td>
+                    <td>CORS Wildcard</td>
+                    <td><span class="badge badge-high">Alta</span></td>
+                    <td><code>Access-Control-Allow-Origin: *</code> en endpoint de pagos</td>
+                </tr>
+                <tr>
+                    <td>A6</td>
+                    <td><code>config.php</code></td>
+                    <td>5-8</td>
+                    <td>Credenciales DB</td>
+                    <td><span class="badge badge-high">Alta</span></td>
+                    <td>MySQL root sin contrasena en configuracion</td>
+                </tr>
+                <tr>
+                    <td>A7</td>
+                    <td><code>config.php</code></td>
+                    <td>11-16</td>
+                    <td>Credenciales API</td>
+                    <td><span class="badge badge-high">Alta</span></td>
+                    <td>PAYPAL_CLIENT_SECRET y BREVO_API_KEY en codigo fuente</td>
+                </tr>
+                <tr>
+                    <td>A8</td>
+                    <td><code>api_admin_auth.php</code></td>
+                    <td>20-35</td>
+                    <td>Brute Force</td>
+                    <td><span class="badge badge-high">Alta</span></td>
+                    <td>Sin rate limiting real. <code>sleep(1)</code> es trivialmente evitable</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>2.3 Vulnerabilidades de Severidad Media</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tipo</th>
+                    <th>Descripcion</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>M1</td>
+                    <td>CSRF</td>
+                    <td>Ausencia total de tokens CSRF en todo el sistema</td>
+                </tr>
+                <tr>
+                    <td>M2</td>
+                    <td>Session Fixation</td>
+                    <td>Falta <code>session_regenerate_id(true)</code> tras login</td>
+                </tr>
+                <tr>
+                    <td>M3</td>
+                    <td>Cookie Insegura</td>
+                    <td>Sin flags httponly, secure, samesite en cookies de sesion</td>
+                </tr>
+                <tr>
+                    <td>M4</td>
+                    <td>MIME Confusion</td>
+                    <td>Sin validacion de tipo MIME real en uploads</td>
+                </tr>
+                <tr>
+                    <td>M5</td>
+                    <td>Error Suppression</td>
+                    <td><code>error_reporting(0)</code> silencia todos los errores incluyendo logs</td>
+                </tr>
+                <tr>
+                    <td>M6</td>
+                    <td>Stored XSS</td>
+                    <td>HTML sin sanitizar en emails masivos de marketing</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>2.4 Vulnerabilidades de Severidad Baja</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tipo</th>
+                    <th>Descripcion</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>B1</td>
+                    <td>Info Disclosure</td>
+                    <td>Errores de BD y PayPal retornados al cliente en <code>api_pagos.php</code></td>
+                </tr>
+                <tr>
+                    <td>B2</td>
+                    <td>Type Juggling</td>
+                    <td>Uso de <code>==</code> en vez de <code>===</code> para comparar credenciales</td>
+                </tr>
+                <tr>
+                    <td>B3</td>
+                    <td>Exposed Tool</td>
+                    <td><code>update_db.php</code> (ALTER TABLE) accesible publicamente sin auth</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 3. ARQUITECTURA -->
+    <div id="arquitectura" class="page-break">
+        <h2>3. Analisis de Arquitectura y Calidad de Codigo</h2>
+
+        <h3>3.1 Estructura Actual del Proyecto</h3>
+        <div class="code-block">cardStudio/
+├── index.html              <span class="comment">&lt;- Landing publica</span>
+├── editor_cliente.html     <span class="comment">&lt;- Editor de cliente (308 lineas JS inline)</span>
+├── api_publica.php         <span class="comment">&lt;- API publica (sin auth)</span>
+├── api_auth.php            <span class="comment">&lt;- Auth de clientes</span>
+├── api_pagos.php           <span class="comment">&lt;- Pagos PayPal</span>
+├── config.php              <span class="comment"><span class="danger">&lt;- Credenciales en texto plano</span></span>
+├── setup.sql
+├── update_db.php           <span class="comment"><span class="danger">&lt;- Expuesto publicamente</span></span>
+├── listar_disenos.php      <span class="comment">&lt;- Duplicado obsoleto</span>
+├── css/ js/ languages/
+└── admin/
+    ├── api.php             <span class="comment"><span class="danger">&lt;- GOD FILE: auth + CRUD + uploads</span></span>
+    ├── api_admin_auth.php  <span class="comment"><span class="danger">&lt;- Credenciales hardcodeadas</span></span>
+    ├── api_emails.php      <span class="comment">&lt;- Marketing masivo</span>
+    ├── auth_guard.php
+    ├── login.html          <span class="comment">&lt;- Version antigua (admin/1234)</span>
+    ├── login.php           <span class="comment">&lt;- Version nueva (bcrypt)</span>
+    ├── dashboard.html      <span class="comment">&lt;- Version con i18n</span>
+    ├── dashboard.php       <span class="comment">&lt;- Version sin i18n (95% identica)</span>
+    ├── crear-diseno.html
+    ├── marketing.php
+    └── uploads/            <span class="comment"><span class="danger">&lt;- Permisos 0777</span></span></div>
+
+        <h3>3.2 Problemas Arquitectonicos Principales</h3>
+
+        <div class="two-col">
+            <div class="col-box">
+                <h4>Si, tiene</h4>
+                <ul>
+                    <li>Separacion basica frontend/admin</li>
+                    <li>Auth guard como middleware</li>
+                    <li>Sesion admin separada</li>
+                    <li>Un servicio (BrevoService)</li>
+                    <li>i18n parcial</li>
+                    <li>config.php en .gitignore</li>
+                </ul>
+            </div>
+            <div class="col-box">
+                <h4>No tiene</h4>
+                <ul>
+                    <li>Framework PHP ni JavaScript</li>
+                    <li>Composer / npm</li>
+                    <li>Tests (PHPUnit, Jest)</li>
+                    <li>CI/CD</li>
+                    <li>Docker</li>
+                    <li>Capa de modelos/servicios</li>
+                    <li>Prepared statements</li>
+                    <li>Migraciones de DB</li>
+                    <li>Autoloading PSR-4</li>
+                    <li>Logging apropiado</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>3.3 Codigo Duplicado</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Elemento Duplicado</th>
+                    <th>Archivos</th>
+                    <th>Lineas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Login admin (2 sistemas diferentes)</td>
+                    <td><code>admin/api.php</code> vs <code>admin/api_admin_auth.php</code></td>
+                    <td>~30 lineas</td>
+                </tr>
+                <tr>
+                    <td>Dashboard admin (2 versiones)</td>
+                    <td><code>dashboard.html</code> vs <code>dashboard.php</code></td>
+                    <td>~210 lineas</td>
+                </tr>
+                <tr>
+                    <td>Login admin (2 versiones)</td>
+                    <td><code>login.html</code> vs <code>login.php</code></td>
+                    <td>~180 lineas</td>
+                </tr>
+                <tr>
+                    <td>Queries de disenos</td>
+                    <td><code>admin/api.php</code>, <code>api_publica.php</code>, <code>listar_disenos.php</code></td>
+                    <td>~40 lineas</td>
+                </tr>
+                <tr>
+                    <td>Sidebar de navegacion</td>
+                    <td><code>dashboard.php</code>, <code>marketing.php</code></td>
+                    <td>~20 lineas</td>
+                </tr>
+                <tr>
+                    <td>CSS inline en HTML</td>
+                    <td><code>index.html</code> duplica <code>landing.css</code> 100%</td>
+                    <td>~215 lineas</td>
+                </tr>
+                <tr>
+                    <td>Variables CSS :root</td>
+                    <td>5 archivos CSS diferentes</td>
+                    <td>~25 lineas x 5</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>3.4 Anti-patrones Detectados</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Anti-patron</th>
+                    <th>Archivo</th>
+                    <th>Descripcion</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Big Ball of Mud</strong></td>
+                    <td><code>admin/api.php</code></td>
+                    <td>Un archivo hace TODO: auth, CRUD categorias, CRUD disenos, uploads, thumbnails, SQL</td>
+                </tr>
+                <tr>
+                    <td><strong>God File</strong></td>
+                    <td><code>admin/api.php</code></td>
+                    <td>138 lineas, 7 acciones diferentes en un solo archivo procedural</td>
+                </tr>
+                <tr>
+                    <td><strong>Hardcoded Credentials</strong></td>
+                    <td>Multiples</td>
+                    <td>4 credenciales diferentes en texto plano en codigo fuente</td>
+                </tr>
+                <tr>
+                    <td><strong>Shotgun Surgery</strong></td>
+                    <td>Todo el proyecto</td>
+                    <td>Para agregar un tipo de diseno hay que tocar 5+ archivos</td>
+                </tr>
+                <tr>
+                    <td><strong>Spaghetti Code (JS)</strong></td>
+                    <td><code>crear-diseno.js</code></td>
+                    <td>470 lineas con 7+ variables globales, canvas, events, persistence, UI</td>
+                </tr>
+                <tr>
+                    <td><strong>Inline SQL</strong></td>
+                    <td>Todos los PHP</td>
+                    <td>Todas las queries construidas con concatenacion de strings</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>3.5 Ausencia de Capa de Servicios</h3>
+        <div class="two-col">
+            <div class="col-box">
+                <h4>Lo que deberia existir</h4>
+                <ul>
+                    <li><code>src/Models/Usuario.php</code></li>
+                    <li><code>src/Models/Diseno.php</code></li>
+                    <li><code>src/Services/AuthService.php</code></li>
+                    <li><code>src/Services/PagoService.php</code></li>
+                    <li><code>src/Services/UploadService.php</code></li>
+                    <li><code>src/Controllers/BaseController.php</code></li>
+                </ul>
+            </div>
+            <div class="col-box">
+                <h4>Lo que existe</h4>
+                <ul>
+                    <li><code>admin/includes/db.php</code> - variable global <code>$conn</code></li>
+                    <li><code>admin/includes/brevo_service.php</code> - la unica clase</li>
+                    <li><code>admin/auth_guard.php</code> - middleware basico</li>
+                    <li>Todo lo demas: SQL inline en cada endpoint</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. FRONTEND Y UX -->
+    <div id="frontend" class="page-break">
+        <h2>4. Analisis de Frontend y UX</h2>
+
+        <h3>4.1 JavaScript Inline Masivo</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Archivo</th>
+                    <th>Lineas JS inline</th>
+                    <th>Contenido</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>editor_cliente.html</code></td>
+                    <td><strong>308 lineas</strong></td>
+                    <td>Motor Canvas, auth, PayPal, descarga, login, rendering</td>
+                </tr>
+                <tr>
+                    <td><code>marketing.php</code></td>
+                    <td>66 lineas</td>
+                    <td>Stats, envio masivo, UI feedback</td>
+                </tr>
+                <tr>
+                    <td><code>login.php</code></td>
+                    <td>52 lineas</td>
+                    <td>DoLogin, mostrarError, validacion</td>
+                </tr>
+                <tr>
+                    <td><code>index.html</code></td>
+                    <td>50 lineas</td>
+                    <td>Catalogo, personalizacion</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>4.2 Archivos Duplicados</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Version Antigua</th>
+                    <th>Version Nueva</th>
+                    <th>Diferencia Clave</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>login.html</code> (admin/1234, FormData)</td>
+                    <td><code>login.php</code> (bcrypt, JSON)</td>
+                    <td>Diferente API, diferente auth, diferente UI</td>
+                </tr>
+                <tr>
+                    <td><code>dashboard.html</code> (con i18n)</td>
+                    <td><code>dashboard.php</code> (sin i18n)</td>
+                    <td>95% identico, 210 lineas duplicadas</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>4.3 Problemas de Accesibilidad (WCAG)</h3>
+        <div class="warning-box">
+            <strong>Hallazgo:</strong> Se encontraron <strong>0 (cero) atributos <code>aria-*</code></strong> en todo el proyecto.
+        </div>
+        <ul>
+            <li><strong>Modales</strong>: sin <code>role="dialog"</code>, sin trap de foco, sin cierre con Escape</li>
+            <li><strong>Canvas</strong>: sin <code>role="img"</code> ni <code>aria-label</code> alternativo</li>
+            <li><strong>Formularios</strong>: labels sin <code>for</code>/<code>id</code> asociado</li>
+            <li><strong>Contraste</strong>: texto <code>#888</code> sobre fondo <code>#1a1a1a</code> = ratio ~3.5:1 (minimo WCAG AA: 4.5:1)</li>
+            <li><strong>Navegacion</strong>: sidebar usa <code>&lt;div onclick&gt;</code> en vez de <code>&lt;button&gt;</code> o <code>&lt;a&gt;</code></li>
+        </ul>
+
+        <h3>4.4 Problemas de UX</h3>
+        <ul>
+            <li><strong>Auto-registro invisible</strong>: Al descargar sin cuenta, se crea automaticamente sin que el usuario lo sepa</li>
+            <li><strong><code>alert()</code> nativo</strong> en 15+ ubicaciones - rompe la experiencia visual premium</li>
+            <li><strong>Sin loading states</strong>: la mayoria de paginas no muestra spinner al cargar datos</li>
+            <li><strong>Logout inconsistente</strong>: 3 destinos diferentes segun la pagina</li>
+            <li><strong>Placeholder con credenciales</strong>: <code>login.html</code> muestra <code>placeholder="1234"</code></li>
+        </ul>
+
+        <h3>4.5 Performance</h3>
+        <ul>
+            <li><strong>Imagenes sin optimizar</strong>: PNGs de 755 KB sin conversion a WebP</li>
+            <li><strong>~25 fuentes Google Fonts</strong> cargadas en el editor (mayoria sin usar)</li>
+            <li><strong>Sin minificacion</strong>: ningun archivo CSS/JS esta minificado</li>
+            <li><strong><code>innerHTML +=</code> en bucle</code>: re-parsea todo el DOM en cada iteracion</li>
+            <li><strong>CSS duplicado</strong>: <code>index.html</code> carga <code>landing.css</code> Y lo tiene inline</li>
+        </ul>
+
+        <h3>4.6 Internacionalizacion Incompleta</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Pagina</th>
+                    <th>Estado i18n</th>
+                    <th>Strings Hardcoded</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>index.html</code></td>
+                    <td style="color: #16a34a;">Completo</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td><code>editor_cliente.html</code></td>
+                    <td style="color: #16a34a;">Completo</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td><code>crear-diseno.html/js</code></td>
+                    <td style="color: #ca8a04;">Parcial</td>
+                    <td>~5 strings</td>
+                </tr>
+                <tr>
+                    <td><code>dashboard.php</code></td>
+                    <td style="color: #dc2626;">Sin i18n</td>
+                    <td>~10 strings</td>
+                </tr>
+                <tr>
+                    <td><code>login.php</code></td>
+                    <td style="color: #dc2626;">Sin i18n</td>
+                    <td>~10 strings</td>
+                </tr>
+                <tr>
+                    <td><code>marketing.php</code></td>
+                    <td style="color: #dc2626;">Sin i18n</td>
+                    <td>~20 strings</td>
+                </tr>
+                <tr>
+                    <td><code>dashboard.js</code></td>
+                    <td style="color: #dc2626;">Sin i18n</td>
+                    <td>~5 strings</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>4.7 Inconsistencia Visual</h3>
+        <ul>
+            <li><strong>2 nombres de marca</strong>: "CardStudio" (paginas nuevas) vs "TarjetasStudio" (admin viejo)</li>
+            <li><strong>3 anchos de sidebar</strong>: 200px, 240px, 250px en diferentes archivos</li>
+            <li><strong>Fuentes diferentes</strong>: Poppins (mayoria) vs Montserrat (dashboard viejo)</li>
+            <li><strong>Estilos de botones inconsistentes</strong>: gradient vs solido, border-radius de 5px a 30px</li>
+            <li><strong>Theme inconsistente</strong>: publico oscuro glassmorphism, admin claro tradicional</li>
+        </ul>
+    </div>
+
+    <!-- 5. PLAN DE ACCION -->
+    <div id="plan" class="page-break">
+        <h2>5. Plan de Accion por Fases</h2>
+
+        <div class="phase phase-0">
+            <div class="phase-header">
+                <span>FASE 0: Emergencia - Seguridad Inmediata</span>
+                <span class="time">1-2 dias</span>
+            </div>
+            <div class="phase-body">
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Tarea</th><th>Archivos</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0.1</td><td><strong>Eliminar backdoor</strong> admin/1234 en api.php</td><td><code>admin/api.php</code></td></tr>
+                        <tr><td>0.2</td><td><strong>Eliminar credenciales hardcodeadas</strong> de api_admin_auth.php</td><td><code>api_admin_auth.php</code>, <code>config.php</code></td></tr>
+                        <tr><td>0.3</td><td><strong>Agregar auth a admin/api.php</strong> - verificar sesion en cada accion</td><td><code>admin/api.php</code></td></tr>
+                        <tr><td>0.4</td><td><strong>Bloquear update_db.php</strong> de acceso publico</td><td><code>update_db.php</code></td></tr>
+                        <tr><td>0.5</td><td><strong>Validar uploads</strong>: extensiones permitidas, MIME type, tamano maximo</td><td><code>admin/api.php</code></td></tr>
+                        <tr><td>0.6</td><td><strong>Corregir permisos</strong> de uploads/ de 0777 a 0755</td><td><code>admin/api.php</code></td></tr>
+                        <tr><td>0.7</td><td><strong>Eliminar listar_disenos.php</strong> (duplicado obsoleto)</td><td><code>listar_disenos.php</code></td></tr>
+                        <tr><td>0.8</td><td><strong>Corregir CORS</strong> en api_pagos.php - dominio especifico</td><td><code>api_pagos.php</code></td></tr>
+                        <tr><td>0.9</td><td><strong>No exponer mysqli_error()</strong> al cliente</td><td><code>admin/api.php</code>, <code>api_pagos.php</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="phase phase-1">
+            <div class="phase-header">
+                <span>FASE 1: Infraestructura Base</span>
+                <span class="time">3-5 dias</span>
+            </div>
+            <div class="phase-body">
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Tarea</th><th>Archivos</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1.1</td><td><strong>Instalar Composer</strong> y crear composer.json</td><td>Nuevo <code>composer.json</code></td></tr>
+                        <tr><td>1.2</td><td><strong>Crear .env.example</strong> con todas las credenciales</td><td>Nuevo <code>.env.example</code></td></tr>
+                        <tr><td>1.3</td><td><strong>Prepared statements</strong> - helper query($sql, $params)</td><td><code>includes/db.php</code></td></tr>
+                        <tr><td>1.4</td><td><strong>CSRF tokens</strong> - funcion generate/verify</td><td>Nuevo <code>includes/csrf.php</code></td></tr>
+                        <tr><td>1.5</td><td><strong>Sesiones seguras</strong> - httponly, secure, samesite</td><td>Todas las APIs PHP</td></tr>
+                        <tr><td>1.6</td><td><strong>Crear .htaccess</strong> - denegar .php en uploads</td><td>Nuevo <code>.htaccess</code></td></tr>
+                        <tr><td>1.7</td><td><strong>Rate limiting</strong> en login (max 5 intentos/IP)</td><td>APIs de auth</td></tr>
+                        <tr><td>1.8</td><td><strong>Eliminar archivos duplicados</strong> - login.html, dashboard.html</td><td>Multiples</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="phase phase-2">
+            <div class="phase-header">
+                <span>FASE 2: Refactorizacion Backend</span>
+                <span class="time">1-2 semanas</span>
+            </div>
+            <div class="phase-body">
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Tarea</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>2.1</td><td><strong>Estructura PSR-4</strong>: Controllers/, Models/, Services/</td></tr>
+                        <tr><td>2.2</td><td><strong>Modelos</strong>: Usuario, Diseno, Categoria, Compra</td></tr>
+                        <tr><td>2.3</td><td><strong>Services</strong>: AuthService, PagoService, EmailService, UploadService</td></tr>
+                        <tr><td>2.4</td><td><strong>Controller base</strong> con manejo estandar de errores y JSON</td></tr>
+                        <tr><td>2.5</td><td><strong>Migrar endpoints</strong> PHP a controllers que usen servicios</td></tr>
+                        <tr><td>2.6</td><td><strong>Logging apropiado</strong> - reemplazar error_reporting(0)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="phase phase-3">
+            <div class="phase-header">
+                <span>FASE 3: Frontend - Unificacion y Calidad</span>
+                <span class="time">1-2 semanas</span>
+            </div>
+            <div class="phase-body">
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Tarea</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>3.1</td><td><strong>Unificar branding</strong> - elegir UN nombre, reemplazar en todo</td></tr>
+                        <tr><td>3.2</td><td><strong>CSS compartido</strong> - variables.css con colores, tipografias</td></tr>
+                        <tr><td>3.3</td><td><strong>Consolidar sidebar</strong> - un componente reutilizable</td></tr>
+                        <tr><td>3.4</td><td><strong>Migrar JS inline</strong> a archivos .js separados</td></tr>
+                        <tr><td>3.5</td><td><strong>Sistema de notificaciones</strong> - reemplazar alert()/confirm() con toasts</td></tr>
+                        <tr><td>3.6</td><td><strong>Accesibilidad</strong> - aria-labels, roles, contraste, labels</td></tr>
+                        <tr><td>3.7</td><td><strong>Eliminar CSS inline</strong> masivo y console.logs de debug</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="phase phase-4">
+            <div class="phase-header">
+                <span>FASE 4: Internacionalizacion Completa</span>
+                <span class="time">3-5 dias</span>
+            </div>
+            <div class="phase-body">
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Tarea</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>4.1</td><td>Agregar i18n a <code>marketing.php</code> (~20 strings hardcoded)</td></tr>
+                        <tr><td>4.2</td><td>Agregar i18n a <code>login.php</code> (~10 strings hardcoded)</td></tr>
+                        <tr><td>4.3</td><td>Agregar i18n a <code>dashboard.php</code> (sin i18n actualmente)</td></tr>
+                        <tr><td>4.4</td><td>Agregar i18n a <code>dashboard.js</code> y <code>crear-diseno.js</code></td></tr>
+                        <tr><td>4.5</td><td>Sincronizar keys de traduccion entre HTML y JSON</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="phase phase-5">
+            <div class="phase-header">
+                <span>FASE 5: Performance y Escalabilidad</span>
+                <span class="time">1 semana</span>
+            </div>
+            <div class="phase-body">
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Tarea</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>5.1</td><td><strong>Optimizar imagenes</strong> - convertir PNGs de 755KB a WebP optimizado</td></tr>
+                        <tr><td>5.2</td><td><strong>Reducir fuentes</strong> - de ~25 a 3-4 esenciales con font-display: swap</td></tr>
+                        <tr><td>5.3</td><td><strong>Minificar CSS/JS</strong> en produccion</td></tr>
+                        <tr><td>5.4</td><td><strong>Headers de cache</strong> - Cache-Control en .htaccess</td></tr>
+                        <tr><td>5.5</td><td><strong>Lazy loading</strong> en imagenes de la galeria</td></tr>
+                        <tr><td>5.6</td><td><strong>Reemplazar innerHTML +=</strong> por insertAdjacentHTML</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="phase phase-6">
+            <div class="phase-header">
+                <span>FASE 6: Calidad y Mantenibilidad (ongoing)</span>
+                <span class="time">Continuo</span>
+            </div>
+            <div class="phase-body">
+                <table>
+                    <thead>
+                        <tr><th>#</th><th>Tarea</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>6.1</td><td><strong>Docker</strong> - docker-compose.yml con Apache + MySQL</td></tr>
+                        <tr><td>6.2</td><td><strong>PHPUnit</strong> - tests para AuthService, PagoService</td></tr>
+                        <tr><td>6.3</td><td><strong>CI/CD</strong> - GitHub Actions para lint PHP + tests</td></tr>
+                        <tr><td>6.4</td><td><strong>PHPStan</strong> para analisis estatico</td></tr>
+                        <tr><td>6.5</td><td><strong>Migraciones de DB</strong> - sistema real con versionado</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. TIMELINE -->
+    <div id="timeline" class="page-break">
+        <h2>6. Timeline Estimado</h2>
+
+        <div style="position: relative; padding: 20px 0;">
+            <div class="timeline-item">
+                <div class="timeline-date" style="color: #dc2626;">DIA 1-2</div>
+                <div class="timeline-line" style="background: #dc2626;"></div>
+                <div class="timeline-content">
+                    <strong style="color: #dc2626;">FASE 0: Emergencia</strong>
+                    Eliminar backdoors, bloquear archivos expuestos, validar uploads
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date" style="color: #ea580c;">DIA 3-7</div>
+                <div class="timeline-line" style="background: #ea580c;"></div>
+                <div class="timeline-content">
+                    <strong style="color: #ea580c;">FASE 1: Infraestructura</strong>
+                    Composer, .env, prepared statements, CSRF, sesiones, .htaccess
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date" style="color: #ca8a04;">SEMANA 2-3</div>
+                <div class="timeline-line" style="background: #ca8a04;"></div>
+                <div class="timeline-content">
+                    <strong style="color: #ca8a04;">FASE 2: Backend Refactor</strong>
+                    Modelos, servicios, controllers, migracion de endpoints
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date" style="color: #16a34a;">SEMANA 3-5</div>
+                <div class="timeline-line" style="background: #16a34a;"></div>
+                <div class="timeline-content">
+                    <strong style="color: #16a34a;">FASE 3: Frontend Unificacion</strong>
+                    Branding, CSS compartido, JS modular, accesibilidad
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date" style="color: #2563eb;">SEMANA 5-6</div>
+                <div class="timeline-line" style="background: #2563eb;"></div>
+                <div class="timeline-content">
+                    <strong style="color: #2563eb;">FASE 4: i18n Completo</strong>
+                    Marketing, login, dashboard - todas las paginas con soporte ES/EN
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date" style="color: #7c3aed;">SEMANA 6-7</div>
+                <div class="timeline-line" style="background: #7c3aed;"></div>
+                <div class="timeline-content">
+                    <strong style="color: #7c3aed;">FASE 5: Performance</strong>
+                    Optimizar imagenes, fuentes, minificacion, cache
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date" style="color: #0369a1;">CONTINUO</div>
+                <div class="timeline-line" style="background: #0369a1;"></div>
+                <div class="timeline-content">
+                    <strong style="color: #0369a1;">FASE 6: Calidad</strong>
+                    Docker, tests, CI/CD, analisis estatico
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>Total estimado: 5-8 semanas</strong> para un refactor completo. La Fase 0 (emergencia de seguridad) puede ejecutarse inmediatamente en 1-2 dias y elimina las vulnerabilidades mas criticas.
+        </div>
+
+        <h3>Resumen de Esfuerzo</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fase</th>
+                    <th>Duracion</th>
+                    <th>Impacto</th>
+                    <th>Prioridad</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>FASE 0</strong> - Emergencia</td>
+                    <td>1-2 dias</td>
+                    <td>Elimina RCE y backdoors</td>
+                    <td><span class="badge badge-critical">Critica</span></td>
+                </tr>
+                <tr>
+                    <td><strong>FASE 1</strong> - Infraestructura</td>
+                    <td>3-5 dias</td>
+                    <td>Base solida para todo lo demas</td>
+                    <td><span class="badge badge-high">Alta</span></td>
+                </tr>
+                <tr>
+                    <td><strong>FASE 2</strong> - Backend</td>
+                    <td>1-2 semanas</td>
+                    <td>Mantenibilidad y escalabilidad</td>
+                    <td><span class="badge badge-high">Alta</span></td>
+                </tr>
+                <tr>
+                    <td><strong>FASE 3</strong> - Frontend</td>
+                    <td>1-2 semanas</td>
+                    <td>UX consistente, accesible</td>
+                    <td><span class="badge badge-medium">Media</span></td>
+                </tr>
+                <tr>
+                    <td><strong>FASE 4</strong> - i18n</td>
+                    <td>3-5 dias</td>
+                    <td>Mercado bilingue completo</td>
+                    <td><span class="badge badge-medium">Media</span></td>
+                </tr>
+                <tr>
+                    <td><strong>FASE 5</strong> - Performance</td>
+                    <td>1 semana</td>
+                    <td>Velocidad y experiencia</td>
+                    <td><span class="badge badge-medium">Media</span></td>
+                </tr>
+                <tr>
+                    <td><strong>FASE 6</strong> - Calidad</td>
+                    <td>Continuo</td>
+                    <td>Confianza y deployment seguro</td>
+                    <td><span class="badge badge-low">Baja</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        <p>Analisis generado por opencode | CardStudio | Julio 2026</p>
+        <p>Documento confidencial - Para uso interno</p>
+    </div>
+
+</div>
+
+</body>
+</html>
