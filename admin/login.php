@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin — CardStudio</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="../js/i18n.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -20,7 +21,6 @@
             overflow: hidden;
         }
 
-        /* Fondo con glow */
         body::before {
             content: '';
             position: fixed;
@@ -169,6 +169,11 @@
             font-size: 0.78rem;
             color: #555;
         }
+
+        .lang-bar {
+            text-align: center;
+            margin-top: 15px;
+        }
     </style>
 </head>
 
@@ -176,30 +181,33 @@
 
     <div class="login-card">
         <p class="logo">Card<span>Studio</span></p>
-        <p class="subtitle">Panel de Administración</p>
+        <p class="subtitle" data-i18n="login_panel_title">Panel de Administración</p>
         <div style="text-align:center; margin-bottom: 30px;">
-            <span class="badge-admin">🔒 Acceso Restringido</span>
+            <span class="badge-admin" data-i18n="login_access_restricted">🔒 Acceso Restringido</span>
         </div>
 
         <div class="field">
-            <label for="usuario">Usuario</label>
-            <input type="text" id="usuario" placeholder="Ingresa tu usuario" autocomplete="username">
+            <label for="usuario" data-i18n="admin_user">Usuario</label>
+            <input type="text" id="usuario" data-i18n-placeholder="login_placeholder_user" placeholder="Ingresa tu usuario" autocomplete="username">
         </div>
 
         <div class="field">
-            <label for="password">Contraseña</label>
-            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+            <label for="password" data-i18n="admin_pass">Contraseña</label>
+            <input type="password" id="password" data-i18n-placeholder="login_placeholder_pass" placeholder="••••••••" autocomplete="current-password">
         </div>
 
-        <button class="btn-login" id="btnLogin" onclick="doLogin()">Entrar al Panel</button>
+        <button class="btn-login" id="btnLogin" onclick="doLogin()" data-i18n="login_btn_enter">Entrar al Panel</button>
 
         <div id="errorMsg"></div>
 
-        <p class="login-footer">CardStudio © 2025 — Solo personal autorizado</p>
+        <p class="login-footer" data-i18n="login_footer">CardStudio © 2025 — Solo personal autorizado</p>
+
+        <div class="lang-bar">
+            <script>document.write(i18n.createSwitcher())</script>
+        </div>
     </div>
 
     <script>
-        // Permitir login con Enter
         document.getElementById('password').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') doLogin();
         });
@@ -214,11 +222,11 @@
             const errMsg   = document.getElementById('errorMsg');
 
             if (!usuario || !password) {
-                mostrarError('Por favor completa ambos campos.');
+                mostrarError(i18n.t('login_empty_fields'));
                 return;
             }
 
-            btn.textContent = 'Verificando...';
+            btn.textContent = i18n.t('login_verifying');
             btn.classList.add('loading');
             errMsg.style.display = 'none';
 
@@ -231,16 +239,16 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    btn.textContent = '✓ Acceso concedido';
+                    btn.textContent = i18n.t('login_granted');
                     setTimeout(() => { window.location.href = 'dashboard.php'; }, 600);
                 } else {
-                    mostrarError(data.error || 'Credenciales incorrectas');
-                    btn.textContent = 'Entrar al Panel';
+                    mostrarError(data.error || i18n.t('login_denied'));
+                    btn.textContent = i18n.t('login_btn_enter');
                     btn.classList.remove('loading');
                 }
             } catch (e) {
-                mostrarError('Error de conexión. ¿Está el servidor encendido?');
-                btn.textContent = 'Entrar al Panel';
+                mostrarError(i18n.t('login_error_connection'));
+                btn.textContent = i18n.t('login_btn_enter');
                 btn.classList.remove('loading');
             }
         }

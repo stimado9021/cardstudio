@@ -5,9 +5,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Diseños - TarjetasStudio</title>
-
+    <title>Mis Diseños - CardStudio</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="../js/i18n.js"></script>
     <style>
         body {
             margin: 0;
@@ -132,7 +132,10 @@
             padding: 50px 0;
         }
 
-        /* --- Responsive Design --- */
+        .lang-bar {
+            padding: 10px 20px;
+        }
+
         @media (max-width: 768px) {
             body {
                 flex-direction: column;
@@ -166,7 +169,6 @@
 
             .sidebar nav div:first-child {
                 display: none;
-                /* Hide 'MENÚ' */
             }
 
             .main-content {
@@ -179,20 +181,22 @@
 <body>
 
     <div class="sidebar">
-        <div class="logo">Tarjetas<span>Studio</span></div>
+        <div class="logo">Card<span>Studio</span></div>
         <nav style="padding: 0 20px;">
-            <div style="color: #888; font-size: 0.8rem; margin-bottom: 10px;">MENÚ</div>
-            <div onclick="location.href='crear-diseno.html'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;">🎨 Editor Maestro</div>
-            <div style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;" onclick="location.href='dashboard.php'">📁 Mis Diseños</div>
-            <div onclick="location.href='marketing.php'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;">📧 Marketing Masivo</div>
-            <div onclick="logout()" style="margin-top:auto; cursor: pointer; opacity: 0.7; color:#ff4d29;">🚪 Cerrar sesión</div>
+            <div style="color: #888; font-size: 0.8rem; margin-bottom: 10px;" data-i18n="menu">MENÚ</div>
+            <div onclick="location.href='crear-diseno.html'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;" data-i18n="menu_editor">🎨 Editor Maestro</div>
+            <div style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;" onclick="location.href='dashboard.php'" data-i18n="menu_designs">📁 Mis Diseños</div>
+            <div onclick="location.href='marketing.php'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;" data-i18n="menu_marketing">📧 Marketing Masivo</div>
+            <div onclick="logout()" style="margin-top:auto; cursor: pointer; opacity: 0.7; color:#ff4d29;" data-i18n="menu_logout">🚪 Cerrar sesión</div>
         </nav>
+        <div class="lang-bar">
+            <script>document.write(i18n.createSwitcher())</script>
+        </div>
     </div>
 
     <div class="main-content">
-        <h1>Mis Diseños</h1>
+        <h1 data-i18n="dashboard_title">Mis Diseños</h1>
         <div class="grid-container" id="designsGrid">
-            <!-- Los diseños se cargarán aquí por JS -->
         </div>
     </div>
 

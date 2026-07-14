@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketing Masivo — CardStudio</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="../js/i18n.js"></script>
     <style>
         :root {
             --primary: #ff4d29;
@@ -27,7 +28,6 @@
             min-height: 100vh;
         }
 
-        /* Sidebar similar to dashboard but styled better */
         .sidebar {
             width: 240px;
             background: rgba(0, 0, 0, 0.3);
@@ -115,7 +115,7 @@
 
         .field { margin-bottom: 24px; }
         .field label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        
+
         .field input, .field textarea {
             width: 100%;
             padding: 16px;
@@ -191,6 +191,12 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .lang-bar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 20px;
+        }
     </style>
 </head>
 <body>
@@ -198,48 +204,51 @@
     <div class="sidebar">
         <div class="logo">Card<span>Studio</span></div>
         <nav>
-            <a href="dashboard.php" class="nav-item">📁 Mis Diseños</a>
-            <a href="crear-diseno.html" class="nav-item">🎨 Editor Maestro</a>
-            <a href="marketing.php" class="nav-item active">📧 Marketing Masivo</a>
-            <div onclick="logout()" class="nav-item" style="margin-top: auto; color: var(--primary)">🚪 Cerrar sesión</div>
+            <a href="dashboard.php" class="nav-item" data-i18n="menu_designs">📁 Mis Diseños</a>
+            <a href="crear-diseno.html" class="nav-item" data-i18n="menu_editor">🎨 Editor Maestro</a>
+            <a href="marketing.php" class="nav-item active" data-i18n="menu_marketing">📧 Marketing Masivo</a>
+            <div onclick="logout()" class="nav-item" style="margin-top: auto; color: var(--primary)" data-i18n="menu_logout">🚪 Cerrar sesión</div>
         </nav>
+        <div style="margin-top: 20px;">
+            <script>document.write(i18n.createSwitcher())</script>
+        </div>
     </div>
 
     <div class="main-content">
         <header>
             <div>
-                <h1>📧 Marketing Masivo</h1>
-                <p style="color: var(--text-dim)">Envía campañas de correo a todos tus usuarios registrados.</p>
+                <h1 data-i18n="marketing_title">📧 Marketing Masivo</h1>
+                <p style="color: var(--text-dim)" data-i18n="marketing_subtitle">Envía campañas de correo a todos tus usuarios registrados.</p>
             </div>
         </header>
 
         <div class="stats-grid">
             <div class="stat-card">
-                <p class="label">Total Suscriptores</p>
+                <p class="label" data-i18n="marketing_subscribers">Total Suscriptores</p>
                 <p class="value" id="subscriberCount">...</p>
             </div>
             <div class="stat-card">
-                <p class="label">Conexión Brevo</p>
-                <p class="value" style="color: #4ade80; font-size: 1.2rem;">🟢 Activa</p>
+                <p class="label" data-i18n="marketing_brevo_status">Conexión Brevo</p>
+                <p class="value" style="color: #4ade80; font-size: 1.2rem;" data-i18n="marketing_brevo_active">🟢 Activa</p>
             </div>
         </div>
 
         <div class="composer">
             <div class="field">
-                <label for="subject">Asunto del Correo</label>
-                <input type="text" id="subject" placeholder="Ej: ¡Nueva colección de tarjetas de cumpleaños!">
+                <label for="subject" data-i18n="marketing_subject">Asunto del Correo</label>
+                <input type="text" id="subject" data-i18n-placeholder="marketing_subject_placeholder" placeholder="Ej: ¡Nueva colección de tarjetas de cumpleaños!">
             </div>
 
             <div class="field">
-                <label for="content">Contenido (HTML permitido)</label>
+                <label for="content" data-i18n="marketing_content">Contenido (HTML permitido)</label>
                 <div style="background: rgba(255, 77, 41, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.8rem; border: 1px dashed var(--primary);">
-                    💡 <strong>Variables disponibles:</strong> Usa <code>{{nombre}}</code> para el nombre del cliente y <code>{{email}}</code> para su correo.
+                    <span data-i18n="marketing_variables_hint">💡 <strong>Variables disponibles:</strong> Usa <code>{{nombre}}</code> para el nombre del cliente y <code>{{email}}</code> para su correo.</span>
                 </div>
-                <textarea id="content" placeholder="Escribe aquí tu mensaje... Puedes usar etiquetas HTML para diseño profesional."></textarea>
+                <textarea id="content" data-i18n-placeholder="marketing_content_placeholder" placeholder="Escribe aquí tu mensaje... Puedes usar etiquetas HTML para diseño profesional."></textarea>
             </div>
 
             <button class="btn-send" id="btnSend" onclick="sendEmails()">
-                <span id="btnText">🚀 Enviar a todos</span>
+                <span id="btnText" data-i18n="marketing_btn_send">🚀 Enviar a todos</span>
             </button>
 
             <div id="statusMsg"></div>
