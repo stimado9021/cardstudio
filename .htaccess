@@ -1,0 +1,45 @@
+# Seguridad general
+<IfModule mod_headers.c>
+    # Headers de seguridad
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Bloquear acceso a archivos de configuración y sensibles
+<FilesMatch "\.(env|git|htaccess|htpasswd|ini|log|sh|sql|bak)$">
+    Require all denied
+</FilesMatch>
+
+# Bloquear acceso a config.php directamente
+<Files "config.php">
+    Require all denied
+</Files>
+
+# Bloquear ejecución de PHP en uploads/
+<Directory "admin/uploads">
+    <FilesMatch "\.php$">
+        Require all denied
+    </FilesMatch>
+</Directory>
+
+# Bloquear acceso a update_db.php
+<Files "update_db.php">
+    Require all denied
+</Files>
+
+# Bloquear acceso a listar_disenos.php
+<Files "listar_disenos.php">
+    Require all denied
+</Files>
+
+# Cache para assets estáticos
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>

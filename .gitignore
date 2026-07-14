@@ -1,6 +1,12 @@
-# Archivos de configuración
+# Archivos de configuración sensibles
 config.php
+.env
+.env.*
 
-# Ignorar archivos temporales
+# Archivos temporales del sistema
 .DS_Store
 Thumbs.db
+
+# Logs
+error_log
+*.log

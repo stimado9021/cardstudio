@@ -17,3 +17,8 @@ define('PAYPAL_MODE', 'sandbox'); // 'sandbox' o 'live'
 
 // Configuración de Brevo (Email Marketing)
 define('BREVO_API_KEY', 'TU_API_KEY_DE_BREVO_AQUI');
+
+// Credenciales del Administrador
+// Para generar el hash ejecuta en PHP: echo password_hash('tu_password', PASSWORD_BCRYPT);
+define('ADMIN_USER', 'admin');
+define('ADMIN_PASS_HASH', 'TU_HASH_BCRYPT_AQUI');

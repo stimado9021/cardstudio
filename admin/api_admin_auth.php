@@ -1,33 +1,26 @@
 <?php
 // ================================================================
 //  admin/api_admin_auth.php
-//  Gestión de sesión del administrador (independiente de usuarios)
+//  Gestión de sesión del administrador
 // ================================================================
-session_name('cardstudio_admin'); // Sesión separada de la de clientes
+session_name('cardstudio_admin');
 session_start();
 
 header('Content-Type: application/json');
 
-// ─── Credenciales del Administrador ────────────────────────────────
-// Cambia estos valores antes de ir a producción.
-// La contraseña se guarda como hash para mayor seguridad.
-define('ADMIN_USER', 'admin');
-define('ADMIN_PASS_HASH', password_hash('cardstudio2025', PASSWORD_BCRYPT));
-// ────────────────────────────────────────────────────────────────────
+require_once __DIR__ . '/../includes/services/AuthService.php';
 
 $action = $_GET['action'] ?? '';
+$authService = new AuthService();
 
 if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     $usuario  = trim($data['usuario'] ?? '');
     $password = $data['password'] ?? '';
 
-    if ($usuario === ADMIN_USER && password_verify($password, ADMIN_PASS_HASH)) {
-        $_SESSION['admin_logged_in'] = true;
-        $_SESSION['admin_user']      = $usuario;
+    if ($authService->loginAdmin($usuario, $password)) {
         echo json_encode(['success' => true]);
     } else {
-        // Delay para dificultar ataques de fuerza bruta
         sleep(1);
         echo json_encode(['success' => false, 'error' => 'Credenciales incorrectas']);
     }
@@ -35,12 +28,12 @@ if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'check') {
-    echo json_encode(['logged_in' => isset($_SESSION['admin_logged_in'])]);
+    echo json_encode(['logged_in' => $authService->isAdminLoggedIn()]);
     exit;
 }
 
 if ($action === 'logout') {
-    session_destroy();
+    $authService->logoutAdmin();
     echo json_encode(['success' => true]);
     exit;
 }

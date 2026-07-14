@@ -465,6 +465,7 @@ function limpiarEditor() {
 }
 
 function logout() {
-    localStorage.removeItem('user_session');
-    window.location.href = '../index.html';
+    fetch('api_admin_auth.php?action=logout').then(() => {
+        window.location.href = 'login.php';
+    });
 }

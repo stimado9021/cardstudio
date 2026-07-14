@@ -1,9 +1,8 @@
 <?php
-require_once 'admin/includes/db.php';
-$sql = "ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS nombre VARCHAR(255) DEFAULT 'Cliente' AFTER id_usuario";
-if (mysqli_query($conn, $sql)) {
-    echo "Columna 'nombre' añadida con éxito.";
-} else {
-    echo "Error o la columna ya existe: " . mysqli_error($conn);
-}
+// update_db.php - ARCHIVO BLOQUEADO
+// Este archivo ha sido deshabilitado por seguridad.
+// Para migraciones de base de datos, usa el script SQL correspondiente.
+http_response_code(403);
+echo json_encode(['error' => 'Este archivo ha sido deshabilitado por seguridad.']);
+exit;
 ?>
