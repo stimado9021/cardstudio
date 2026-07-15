@@ -35,7 +35,11 @@ window.onload = async () => {
                 document.getElementById('categoriaSelect').value = diseno.id_categoria;
                 textos = JSON.parse(diseno.configuracion_textos_json);
                 fondoImg.src = diseno.imagen_fondo_url; 
-                fondoImg.onload = draw;
+                fondoImg.onload = async function() {
+                    await document.fonts.ready;
+                    draw();
+                    if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
+                };
             } else {
                 alert(i18n.t("design_not_found"));
                 añadirTexto();
@@ -69,6 +73,7 @@ function añadirTexto() {
     seleccionadoIdx = textos.length - 1;
     actualizarPanelControl();
     draw();
+    if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
 }
 
 function añadirParrafo() {
@@ -96,20 +101,19 @@ function añadirParrafo() {
     seleccionadoIdx = textos.length - 1;
     actualizarPanelControl();
     draw();
+    if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
 }
 
 function eliminarCapa() {
     if (seleccionadoIdx === null) return;
-    if (confirm("¿Estás seguro de que deseas eliminar este texto/párrafo?")) {
-        textos.splice(seleccionadoIdx, 1);
-        seleccionadoIdx = null;
-        draw();
-        
-        // Limpiar inputs
-        document.getElementById('textoInput').value = "";
-        document.getElementById('groupMaxWidth').style.display = 'none';
-        document.getElementById('groupAlign').style.display = 'none';
-    }
+    textos.splice(seleccionadoIdx, 1);
+    seleccionadoIdx = null;
+    draw();
+    
+    document.getElementById('textoInput').value = "";
+    document.getElementById('groupMaxWidth').style.display = 'none';
+    document.getElementById('groupAlign').style.display = 'none';
+    if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
 }
 
 function actualizarPanelControl() {
@@ -129,6 +133,11 @@ function actualizarPanelControl() {
     document.getElementById('shadowBlur').value = t.sBlur;
     document.getElementById('shadowX').value = t.sOffsetX;
     document.getElementById('shadowY').value = t.sOffsetY;
+
+    document.getElementById('checkBorder').dispatchEvent(new Event('change'));
+    document.getElementById('checkShadow').dispatchEvent(new Event('change'));
+
+    document.getElementById('fontColorHex').textContent = t.color;
     
     const groupMaxWidth = document.getElementById('groupMaxWidth');
     const groupAlign = document.getElementById('groupAlign');
@@ -167,6 +176,7 @@ function capturarCambios() {
     }
     
     draw();
+    if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
 }
 
 function draw() {
@@ -323,6 +333,7 @@ canvas.addEventListener('mousedown', (e) => {
             canvas.style.cursor = 'grabbing';
             actualizarPanelControl();
             draw();
+            if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
             encontrado = true;
             break;
         }
@@ -330,6 +341,7 @@ canvas.addEventListener('mousedown', (e) => {
     if (!encontrado) {
         seleccionadoIdx = null;
         draw();
+        if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
     }
 });
 
@@ -373,6 +385,7 @@ canvas.addEventListener('touchstart', (e) => {
             offset.y = my - textos[i].y;
             actualizarPanelControl();
             draw();
+            if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
             encontrado = true;
             break;
         }
@@ -380,6 +393,7 @@ canvas.addEventListener('touchstart', (e) => {
     if (!encontrado) {
         seleccionadoIdx = null;
         draw();
+        if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
     }
 }, { passive: false });
 
@@ -444,8 +458,7 @@ document.getElementById('btnGuardar').onclick = async () => {
     const data = await res.json();
     
     if (data.success) {
-        alert(i18n.t("success_saving"));
-        limpiarEditor();
+        window.location.href = 'dashboard.php';
     } else {
         alert(i18n.t("error_saving") + " " + data.message);
     }

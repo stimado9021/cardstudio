@@ -13,7 +13,7 @@ class Diseno {
 
     public function findAll() {
         return $this->db->queryAll(
-            "SELECT d.id_diseno, d.nombre_diseno, d.miniatura_url, c.nombre as categoria_nombre 
+            "SELECT d.id_diseno, d.nombre_diseno, d.miniatura_url, d.id_categoria, c.nombre as categoria_nombre 
              FROM disenos d 
              JOIN categorias c ON d.id_categoria = c.id 
              ORDER BY d.id_diseno DESC"
@@ -32,7 +32,7 @@ class Diseno {
         $stmt = $this->db->query(
             "INSERT INTO disenos (nombre_diseno, id_categoria, imagen_fondo_url, miniatura_url, configuracion_textos_json) 
              VALUES (?, ?, ?, ?, ?)",
-            "sssss",
+            "sisss",
             [
                 $data['nombre'],
                 $data['id_categoria'],

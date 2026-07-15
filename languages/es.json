@@ -104,5 +104,7 @@
   "dashboard_category": "Categoría:",
   "dashboard_edit": "Editar Diseño",
   "dashboard_error_loading": "Hubo un error al cargar los diseños.",
-  "btn_cancel_confirm": "Cancelar"
+  "btn_cancel_confirm": "Cancelar",
+  "filter_all": "Todas las categorías",
+  "filter_label": "Filtrar por:"
 }

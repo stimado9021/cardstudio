@@ -6,7 +6,7 @@ header('Content-Type: application/json');
 $action = $_GET['action'] ?? '';
 
 if ($action == 'list_designs') {
-    $query = "SELECT id_diseno, nombre_diseno, imagen_fondo_url, miniatura_url, configuracion_textos_json FROM disenos ORDER BY id_diseno DESC";
+    $query = "SELECT d.id_diseno, d.nombre_diseno, d.imagen_fondo_url, d.miniatura_url, d.configuracion_textos_json, d.id_categoria, c.nombre as categoria_nombre FROM disenos d LEFT JOIN categorias c ON d.id_categoria = c.id ORDER BY d.id_diseno DESC";
     $res = mysqli_query($conn, $query);
    
     $disenos = [];
@@ -15,6 +15,14 @@ if ($action == 'list_designs') {
     }
     
     echo json_encode($disenos);
+    exit;
+}
+
+if ($action == 'list_categories') {
+    $res = mysqli_query($conn, "SELECT id, nombre FROM categorias ORDER BY id");
+    $cats = [];
+    while($row = mysqli_fetch_assoc($res)) $cats[] = $row;
+    echo json_encode($cats);
     exit;
 }
 

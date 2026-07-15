@@ -17,12 +17,7 @@
     Require all denied
 </Files>
 
-# Bloquear ejecución de PHP en uploads/
-<Directory "admin/uploads">
-    <FilesMatch "\.php$">
-        Require all denied
-    </FilesMatch>
-</Directory>
+
 
 # Bloquear acceso a update_db.php
 <Files "update_db.php">

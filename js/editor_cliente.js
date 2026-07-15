@@ -21,7 +21,12 @@ async function init() {
         const data = await response.json();
 
         fondoImg.src = `admin/${data.imagen_fondo_url}`;
-        fondoImg.onload = () => draw();
+        fondoImg.onload = async () => {
+            // Wait for ALL Google Fonts to be ready before drawing on Canvas
+            // Without this, Canvas ignores web fonts and falls back to a generic font
+            await document.fonts.ready;
+            draw();
+        };
 
         const jsonRaw = data.configuracion_textos_json || data.config_json;
         if (jsonRaw) {

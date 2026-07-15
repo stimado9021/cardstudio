@@ -31,7 +31,13 @@ if ($action === 'get_categorias') {
 // --- OBTENER TODOS LOS DISEÑOS ---
 if ($action === 'get_disenos') {
     $diseno = new Diseno();
-    echo json_encode($diseno->findAll());
+    $result = $diseno->findAll();
+    if ($result === false) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Error al obtener diseños']);
+    } else {
+        echo json_encode($result);
+    }
     exit;
 }
 
@@ -53,15 +59,9 @@ if ($action === 'save_design') {
     $uploadService = new UploadService();
     $disenoModel = new Diseno();
 
-    $nombre = mysqli_real_escape_string(
-        Database::getInstance()->getConnection(),
-        $_POST['nombre_diseno'] ?? ''
-    );
+    $nombre = trim($_POST['nombre_diseno'] ?? '');
     $id_cat = (int)($_POST['id_categoria'] ?? 0);
-    $config = mysqli_real_escape_string(
-        Database::getInstance()->getConnection(),
-        $_POST['config_json'] ?? ''
-    );
+    $config = $_POST['config_json'] ?? '';
     $miniatura_base64 = $_POST['miniatura_base64'] ?? '';
     $id_diseno = isset($_POST['id_diseno']) ? (int)$_POST['id_diseno'] : 0;
 

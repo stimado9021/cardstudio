@@ -4,10 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>CardStudio - Diseños Personalizados</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/landing.css">
-    <script src="js/i18n.js"></script>
+    <link rel="stylesheet" href="css/landing.css?v=2">
+    <script src="js/i18n.js?v=2"></script>
     <style>
         :root {
             --primary: #ff4d29;
@@ -215,6 +218,51 @@
             transform: translateY(-2px);
         }
 
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .category-filter select {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            min-width: 250px;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a1a1aa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            transition: all 0.3s;
+        }
+
+        .category-filter select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 77, 41, 0.15);
+        }
+
+        .category-filter select option {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .no-results {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            grid-column: 1 / -1;
+            padding: 60px 0;
+        }
+
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2.5rem;
@@ -222,6 +270,10 @@
 
             .hero {
                 padding: 80px 5% 40px;
+            }
+
+            .category-filter select {
+                min-width: 200px;
             }
         }
     </style>
@@ -232,7 +284,7 @@
     <nav>
         <a href="#" class="logo">Card<span>Studio</span></a>
         <div style="display: flex; align-items: center;">
-            <a href="admin/login.html" class="nav-link" data-i18n="nav_admin">Admin</a>
+            <a href="admin/login.php" class="nav-link" data-i18n="nav_admin">Admin</a>
             <script>document.write(i18n.createSwitcher())</script>
         </div>
     </nav>
@@ -245,61 +297,88 @@
     <main class="container">
         <h2 style="text-align:center; margin-bottom:40px;" data-i18n="section_title">Nuestras Plantillas</h2>
 
+        <div class="category-filter">
+            <select id="categoryFilter" onchange="filtrarPorCategoria()">
+                <option value="all" data-i18n="filter_all">Todas las categorías</option>
+            </select>
+        </div>
+
         <div id="galeria-disenos" class="grid-diseños">
             <p style="text-align:center; grid-column: 1/-1;" data-i18n="loading_catalog">Cargando catálogo...</p>
         </div>
     </main>
 
     <script>
+        let todosLosDisenos = [];
+
         async function cargarCatalogo() {
             const contenedor = document.getElementById('galeria-disenos');
 
             try {
-                // Llamamos a la API para obtener los diseños con sus miniaturas JPG
-                const response = await fetch('api_publica.php?action=list_designs');
-                const disenos = await response.json();
+                const [disenosRes, catsRes] = await Promise.all([
+                    fetch('api_publica.php?action=list_designs'),
+                    fetch('api_publica.php?action=list_categories')
+                ]);
+                const disenos = await disenosRes.json();
+                const categorias = await catsRes.json();
 
-                
+                todosLosDisenos = disenos;
 
-                if (disenos.length === 0) {
-                    contenedor.innerHTML = `<p style='grid-column: 1/-1;'>${i18n.t('no_designs')}</p>`;
-                    return;
-                }
-
-                contenedor.innerHTML = ""; // Limpiar mensaje de carga
-
-                disenos.forEach(d => {
-                  
-                    // Si no tiene miniatura, usamos una por defecto o la de fondo
-                    const imgSrc = 'admin/' + d.miniatura_url ? 'admin/' + d.miniatura_url : d.imagen_fondo_url;
-                    console.log(imgSrc)
-                    const card = `
-                        <div class="card-diseno" onclick="personalizar(${d.id_diseno})">
-                            <div class="img-wrapper">
-                                <img src="${imgSrc}" alt="${d.nombre_diseno}" class="img-miniatura">
-                            </div>
-                            <div class="card-info">
-                                <h3>${d.nombre_diseno || i18n.t('plantilla_especial')}</h3>
-                                <button class="btn-personalizar">${i18n.t('btn_customize')}</button>
-                            </div>
-                        </div>
-                    `;
-                    contenedor.insertAdjacentHTML('beforeend', card);
+                const select = document.getElementById('categoryFilter');
+                categorias.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.id;
+                    opt.textContent = cat.nombre;
+                    select.appendChild(opt);
                 });
 
+                renderDisenos(disenos);
             } catch (error) {
                 console.error("Error al cargar catálogo:", error);
                 contenedor.innerHTML = `<p style='grid-column: 1/-1;'>${i18n.t('error_loading')}</p>`;
             }
         }
 
+        function renderDisenos(lista) {
+            const contenedor = document.getElementById('galeria-disenos');
+            contenedor.innerHTML = "";
+
+            if (lista.length === 0) {
+                contenedor.innerHTML = `<div class="no-results">${i18n.t('no_designs') || 'No se encontraron diseños'}</div>`;
+                return;
+            }
+
+            lista.forEach(d => {
+                const imgSrc = d.miniatura_url ? 'admin/' + d.miniatura_url : 'admin/' + d.imagen_fondo_url;
+                const card = `
+                    <div class="card-diseno" onclick="personalizar(${d.id_diseno})">
+                        <div class="img-wrapper">
+                            <img src="${imgSrc}" alt="${d.nombre_diseno}" class="img-miniatura" loading="lazy">
+                        </div>
+                        <div class="card-info">
+                            <h3>${d.nombre_diseno || i18n.t('plantilla_especial')}</h3>
+                            <button class="btn-personalizar">${i18n.t('btn_customize')}</button>
+                        </div>
+                    </div>
+                `;
+                contenedor.insertAdjacentHTML('beforeend', card);
+            });
+        }
+
+        function filtrarPorCategoria() {
+            const catId = document.getElementById('categoryFilter').value;
+            if (catId === 'all') {
+                renderDisenos(todosLosDisenos);
+            } else {
+                const filtrados = todosLosDisenos.filter(d => d.id_categoria == catId);
+                renderDisenos(filtrados);
+            }
+        }
+
         function personalizar(id) {
-            // Enviamos al editor de cliente con el ID del diseño elegido
-            
             window.location.href = `editor_cliente.html?id=${id}`;
         }
 
-        // Iniciar carga al abrir la página
         document.addEventListener('DOMContentLoaded', cargarCatalogo);
     </script>
 </body>

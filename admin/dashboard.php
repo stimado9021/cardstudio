@@ -132,6 +132,37 @@
             padding: 50px 0;
         }
 
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .filter-bar label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .filter-bar select {
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: 'Montserrat', sans-serif;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            min-width: 220px;
+        }
+
+        .filter-bar select:focus {
+            outline: none;
+            border-color: #ff4d29;
+            box-shadow: 0 0 0 3px rgba(255, 77, 41, 0.15);
+        }
+
         .lang-bar {
             padding: 10px 20px;
         }
@@ -196,6 +227,12 @@
 
     <div class="main-content">
         <h1 data-i18n="dashboard_title">Mis Diseños</h1>
+        <div class="filter-bar">
+            <label for="categoryFilter" data-i18n="filter_label">Filtrar por:</label>
+            <select id="categoryFilter" onchange="filtrarPorCategoria()">
+                <option value="all" data-i18n="filter_all">Todas las categorías</option>
+            </select>
+        </div>
         <div class="grid-container" id="designsGrid">
         </div>
     </div>
@@ -204,7 +241,7 @@
     <script>
         async function logout() {
             await fetch('api_admin_auth.php?action=logout');
-            window.location.href = 'login.php';
+            window.location.href = '../index.html';
         }
     </script>
 </body>

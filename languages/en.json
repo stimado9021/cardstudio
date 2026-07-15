@@ -104,5 +104,7 @@
   "dashboard_category": "Category:",
   "dashboard_edit": "Edit Design",
   "dashboard_error_loading": "There was an error loading the designs.",
-  "btn_cancel_confirm": "Cancel"
+  "btn_cancel_confirm": "Cancel",
+  "filter_all": "All categories",
+  "filter_label": "Filter by:"
 }
