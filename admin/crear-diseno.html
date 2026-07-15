@@ -15,7 +15,10 @@
     <link href="https://fonts.cdnfonts.com/css/bauhaus-93" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/agent-orange" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/antiqua" rel="stylesheet">
-    <link rel="stylesheet" href="css/crear-diseno.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/crear-diseno.css?v=3">
     <script src="../js/i18n.js"></script>
 
 </head>
@@ -23,17 +26,17 @@
 <body>
 
     <div class="sidebar" id="mainSidebar">
-        <div class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Colapsar / Expandir">☰</div>
-        <div class="logo">Tarjetas<span class="logo-text">Studio</span></div>
+        <div class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Colapsar / Expandir">&#9776;</div>
+        <div class="logo"><div class="logo-icon">C</div> <span class="logo-text">CardStudio</span></div>
         <div style="padding: 0 20px; margin-bottom: 15px;" class="sidebar-switcher">
             <script>document.write(i18n.createSwitcher())</script>
         </div>
         <nav style="padding: 0 20px;">
-            <div style="color: #888; font-size: 0.8rem; margin-bottom: 10px;" data-i18n="menu" class="sidebar-label">MENÚ</div>
-            <div data-tip="Editor" style="margin-bottom: 15px; cursor: pointer; color: #ff4d29;" data-i18n="menu_editor">🎨 <span class="sidebar-nav-text">Editor Maestro</span></div>
-            <div data-tip="Diseños" onclick="location.href='dashboard.php'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;" data-i18n="menu_designs">📁 <span class="sidebar-nav-text">Mis Diseños</span></div>
-            <div data-tip="Marketing" onclick="location.href='marketing.php'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;" data-i18n="menu_marketing">📧 <span class="sidebar-nav-text">Marketing Masivo</span></div>
-            <div data-tip="Salir" onclick="logout()" style="cursor: pointer; opacity: 0.7; color:#ff4d29;" data-i18n="menu_logout">🚪 <span class="sidebar-nav-text">Cerrar sesión</span></div>
+            <div style="color: #6B7280; font-size: 0.68rem; margin-bottom: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;" data-i18n="menu" class="sidebar-label">MENÚ</div>
+            <div data-tip="Editor" style="margin-bottom: 15px; cursor: pointer; color: #2E90E5;" data-i18n="menu_editor">&#127912; <span class="sidebar-nav-text">Editor Maestro</span></div>
+            <div data-tip="Diseños" onclick="location.href='dashboard.php'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;" data-i18n="menu_designs">&#128193; <span class="sidebar-nav-text">Mis Diseños</span></div>
+            <div data-tip="Marketing" onclick="location.href='marketing.php'" style="margin-bottom: 15px; cursor: pointer; opacity: 0.7;" data-i18n="menu_marketing">&#128231; <span class="sidebar-nav-text">Marketing Masivo</span></div>
+            <div data-tip="Salir" onclick="logout()" style="cursor: pointer; opacity: 0.7; color: #F87171;" data-i18n="menu_logout">&#128682; <span class="sidebar-nav-text">Cerrar sesión</span></div>
         </nav>
     </div>
 
@@ -138,8 +141,8 @@
                     <div class="control-group">
                         <label data-i18n="admin_fill_color">Color de Relleno</label>
                         <div style="display:flex; gap:10px; align-items:center;">
-                            <input type="color" id="fontColor" class="master-control" value="#ff4d29">
-                            <span id="fontColorHex" style="font-size:0.75rem; color:var(--text-muted);">#ff4d29</span>
+                            <input type="color" id="fontColor" class="master-control" value="#2E90E5">
+                            <span id="fontColorHex" style="font-size:0.75rem; color:var(--text-secondary-dark);">#2E90E5</span>
                         </div>
                     </div>
                 </div>
@@ -249,7 +252,7 @@
         <div class="layer-panel" id="layerPanel">
             <div class="layer-panel-header">
                 <span>📑 CAPAS</span>
-                <span id="layerCount" style="color:var(--neon-orange);">0</span>
+                <span id="layerCount" style="color:var(--brand);">0</span>
             </div>
             <div id="layerList"></div>
         </div>

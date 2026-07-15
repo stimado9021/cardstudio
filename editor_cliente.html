@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personalizar mi Tarjeta - CardStudio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link
         href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Montserrat:wght@400;700&family=Open+Sans:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto:wght@400;700&family=Dancing+Script:wght@700&family=Pacifico&family=Cinzel:wght@400;700&family=Great+Vibes&family=Oswald:wght@700&family=Sacramento&family=Alex+Brush&family=Satisfy&family=Cormorant+Garamond:wght@400;700&family=Caveat:wght@700&family=Bebas+Neue&family=Lobster&family=Fredoka+One&family=Nunito:wght@400;700&family=Bubblegum+Sans&family=Baloo+2:wght@700&family=Quicksand:wght@400;700&family=Raleway:wght@300;400;700&family=Lato:wght@300;400;700&family=Poppins:wght@300;400;700&family=Chewy&family=Bangers&family=Permanent+Marker&family=Comic+Neue:wght@400;700&family=Luckiest+Guy&family=Amatic+SC:wght@400;700&family=Pinyon+Script&family=Alfa+Slab+One&family=Josefin+Sans:wght@400;700&family=Kaushan+Script&family=Lily+Script+One&family=Righteous&family=Architects+Daughter&family=Covered+By+Your+Grace&family=Rock+Salt&family=Special+Elite&display=swap"
         rel="stylesheet">
@@ -14,7 +16,7 @@
     <link href="https://fonts.cdnfonts.com/css/bauhaus-93" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/agent-orange" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/antiqua" rel="stylesheet">
-    <link rel="stylesheet" href="css/editor_cliente.css">
+    <link rel="stylesheet" href="css/editor_cliente.css?v=3">
     <script src="js/i18n.js"></script>
     <!-- PayPal SDK - Sandbox -->
     <script src="https://www.paypal.com/sdk/js?client-id=AWhDuHmBmFqAEMNoKy5IvsOVCWN322CdkQlcMppSopvSmihuXWIT6iSA1m7ObWPlH9hzaHEVTm7ixMiu&currency=USD"></script>
@@ -23,17 +25,16 @@
 <body>
 
     <div class="sidebar-cliente">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <a href="index.html" class="btn-back" data-i18n="btn_back">← Volver a Galería</a>
+        <div class="top-bar">
+            <a href="index.html" class="btn-back" data-i18n="btn_back">&#8592; Galería</a>
             <script>document.write(i18n.createSwitcher())</script>
         </div>
         <h2 id="titulo-diseno" data-i18n="editor_title">Personaliza tu diseño</h2>
-        <p style="font-size: 0.85rem; color: #888; margin-bottom: 30px;" data-i18n="editor_subtitle">Escribe en los campos de abajo para actualizar
-            la tarjeta en tiempo real.</p>
+        <p data-i18n="editor_subtitle">Escribe en los campos de abajo para actualizar la tarjeta en tiempo real.</p>
 
         <div id="controles-dinamicos"></div>
 
-        <button class="btn-download" onclick="descargarTarjeta()" data-i18n="btn_download">📥 DESCARGAR TARJETA</button>
+        <button class="btn-download" onclick="descargarTarjeta()" data-i18n="btn_download">&#8595; Descargar tarjeta</button>
     </div>
 
     <div class="canvas-container">
@@ -41,28 +42,26 @@
     </div>
 
     <!-- Modal Login -->
-    <div id="modalLogin" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center;">
-        <div style="background:var(--sidebar-bg); padding:40px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); width:300px; text-align:center;">
-            <h3 style="margin-top:0;" data-i18n="modal_login_title">Iniciar Sesión</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted);" data-i18n="modal_login_text">Para descargar tu tarjeta, ingresa a tu cuenta. Si no tienes una, se creará automáticamente.</p>
-            <input type="email" id="loginEmail" placeholder="Email" data-i18n="placeholder_email" style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:white; box-sizing:border-box;">
-            <input type="password" id="loginPassword" placeholder="Contraseña" data-i18n="placeholder_password" style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:white; box-sizing:border-box;">
-            <button onclick="login()" style="width:100%; padding:12px; background:linear-gradient(90deg, var(--primary), var(--primary-hover)); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;" data-i18n="btn_login">Entrar / Registrarse</button>
-            <button onclick="document.getElementById('modalLogin').style.display='none'" style="margin-top:15px; background:none; border:none; color:var(--text-muted); cursor:pointer;" data-i18n="btn_cancel">Cancelar</button>
+    <div id="modalLogin" class="modal-overlay">
+        <div class="modal-card">
+            <h3 data-i18n="modal_login_title">Iniciar Sesión</h3>
+            <p data-i18n="modal_login_text">Para descargar tu tarjeta, ingresa a tu cuenta. Si no tienes una, se creará automáticamente.</p>
+            <input type="email" id="loginEmail" placeholder="Email" data-i18n-placeholder="placeholder_email">
+            <input type="password" id="loginPassword" placeholder="Contraseña" data-i18n-placeholder="placeholder_password">
+            <button class="btn-primary" onclick="login()" data-i18n="btn_login">Entrar / Registrarse</button>
+            <button class="btn-secondary" onclick="document.getElementById('modalLogin').style.display='none'" data-i18n="btn_cancel">Cancelar</button>
         </div>
     </div>
 
     <!-- Modal Pago -->
-    <div id="modalPago" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center;">
-        <div style="background:#1a1a1d; padding:40px; border-radius:20px; border:1px solid rgba(255,255,255,0.08); width:380px; text-align:center; box-shadow:0 30px 60px rgba(0,0,0,0.6);">
-            <div style="font-size:2.5rem; margin-bottom:10px;">🎉</div>
-            <h3 style="margin-top:0; font-size:1.4rem;" data-i18n="modal_pay_title">¡Tu diseño está listo!</h3>
-            <p style="font-size:0.9rem; color:#a1a1aa; margin-bottom:5px;" data-i18n="modal_pay_text">Descárgalo sin marca de agua por solo:</p>
-            <div style="font-size:3.5rem; font-weight:800; color:#ff4d29; margin:10px 0; line-height:1;">$1.00 <span style="font-size:1.2rem; color:#a1a1aa;" data-i18n="currency_usd">USD</span></div>
-            <p style="font-size:0.8rem; color:#666; margin-bottom:25px;" data-i18n="pay_footer">Pago único · Descarga inmediata · Sin suscripción</p>
-            <!-- Contenedor de los botones reales de PayPal -->
+    <div id="modalPago" class="modal-overlay">
+        <div class="modal-card">
+            <h3 data-i18n="modal_pay_title">Tu diseño está listo</h3>
+            <p data-i18n="modal_pay_text">Descárgalo sin marca de agua por solo:</p>
+            <div class="price">$1.00 <span data-i18n="currency_usd">USD</span></div>
+            <p class="pay-footer" data-i18n="pay_footer">Pago único · Descarga inmediata · Sin suscripción</p>
             <div id="paypal-button-container" style="min-height:50px;"></div>
-            <button onclick="document.getElementById('modalPago').style.display='none'" style="margin-top:20px; background:none; border:none; color:#666; cursor:pointer; font-size:0.85rem;" data-i18n="btn_cancel">✕ Cancelar</button>
+            <button class="btn-secondary" onclick="document.getElementById('modalPago').style.display='none'" data-i18n="btn_cancel">Cancelar</button>
         </div>
     </div>
 

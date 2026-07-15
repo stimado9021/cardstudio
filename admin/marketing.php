@@ -9,13 +9,13 @@
     <script src="../js/i18n.js"></script>
     <style>
         :root {
-            --primary: #ff4d29;
-            --primary-glow: rgba(255, 77, 41, 0.3);
-            --bg: #0f0f11;
+            --primary: #2E90E5;
+            --primary-glow: rgba(46, 144, 229, 0.25);
+            --bg: #1A1A1A;
             --card-bg: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.06);
             --text: #fff;
-            --text-dim: #a1a1aa;
+            --text-dim: #9CA3AF;
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -140,7 +140,7 @@
         .btn-send {
             width: 100%;
             padding: 18px;
-            background: linear-gradient(135deg, #ff4d29 0%, #ff2a5f 100%);
+            background: linear-gradient(135deg, #2E90E5 0%, #1B6BBF 100%);
             border: none;
             border-radius: 14px;
             color: #fff;
@@ -148,7 +148,7 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 10px 20px rgba(255, 77, 41, 0.2);
+            box-shadow: 0 10px 20px rgba(46, 144, 229, 0.2);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -157,7 +157,7 @@
 
         .btn-send:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(255, 77, 41, 0.3);
+            box-shadow: 0 15px 30px rgba(46, 144, 229, 0.3);
         }
 
         .btn-send:disabled {
@@ -241,7 +241,7 @@
 
             <div class="field">
                 <label for="content" data-i18n="marketing_content">Contenido (HTML permitido)</label>
-                <div style="background: rgba(255, 77, 41, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.8rem; border: 1px dashed var(--primary);">
+                <div style="background: rgba(46, 144, 229, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.8rem; border: 1px dashed var(--primary);">
                     <span data-i18n="marketing_variables_hint">💡 <strong>Variables disponibles:</strong> Usa <code>{{nombre}}</code> para el nombre del cliente y <code>{{email}}</code> para su correo.</span>
                 </div>
                 <textarea id="content" data-i18n-placeholder="marketing_content_placeholder" placeholder="Escribe aquí tu mensaje... Puedes usar etiquetas HTML para diseño profesional."></textarea>

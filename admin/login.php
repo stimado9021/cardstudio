@@ -5,31 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin — CardStudio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="../js/i18n.js"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #0f0f11;
+            background: #1A1A1A;
             color: #fff;
             overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         body::before {
             content: '';
             position: fixed;
-            top: -20%;
+            top: -30%;
             left: 50%;
             transform: translateX(-50%);
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(255, 77, 41, 0.18) 0%, transparent 70%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(46,144,229,0.12) 0%, transparent 70%);
             pointer-events: none;
             z-index: 0;
         }
@@ -37,15 +40,13 @@
         .login-card {
             position: relative;
             z-index: 1;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #222222;
+            border: 1px solid rgba(255,255,255,0.06);
             border-radius: 24px;
-            padding: 50px 45px;
+            padding: 48px 44px;
             width: 100%;
             max-width: 420px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5),
-                        0 0 0 1px rgba(255,255,255,0.04);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
             animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
@@ -55,23 +56,49 @@
         }
 
         .logo {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-        .logo span {
-            background: linear-gradient(90deg, #ff4d29, #ff2a5f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: #2E90E5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            font-weight: 800;
         }
 
         .subtitle {
             text-align: center;
-            color: #a1a1aa;
+            color: #9CA3AF;
             font-size: 0.9rem;
-            margin-bottom: 40px;
+            margin-bottom: 36px;
+        }
+
+        .badge-admin {
+            display: inline-block;
+            background: rgba(46,144,229,0.1);
+            border: 1px solid rgba(46,144,229,0.25);
+            color: #2E90E5;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 4px 14px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
         }
 
         .field {
@@ -80,54 +107,52 @@
 
         .field label {
             display: block;
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: #a1a1aa;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #9CA3AF;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             margin-bottom: 8px;
         }
 
         .field input {
             width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 13px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             color: #fff;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-family: inherit;
-            transition: all 0.3s;
+            transition: all 0.25s;
         }
 
         .field input:focus {
             outline: none;
-            border-color: #ff4d29;
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 4px rgba(255, 77, 41, 0.12);
+            border-color: #2E90E5;
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 3px rgba(46,144,229,0.15);
         }
 
         .btn-login {
             width: 100%;
-            padding: 16px;
-            margin-top: 10px;
-            background: linear-gradient(135deg, #ff4d29 0%, #ff2a5f 100%);
+            padding: 14px;
+            margin-top: 8px;
+            background: #2E90E5;
             border: none;
-            border-radius: 12px;
+            border-radius: 9999px;
             color: #fff;
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 0.95rem;
+            font-weight: 600;
             font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 10px 25px rgba(255, 77, 41, 0.3);
-            position: relative;
-            overflow: hidden;
+            transition: all 0.25s;
         }
 
         .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(255, 77, 41, 0.4);
+            background: #1B6BBF;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(46,144,229,0.3);
         }
 
         .btn-login:active { transform: translateY(0); }
@@ -141,38 +166,24 @@
             margin-top: 16px;
             padding: 12px 16px;
             border-radius: 10px;
-            background: rgba(255, 77, 41, 0.15);
-            border: 1px solid rgba(255, 77, 41, 0.3);
-            color: #ff6b4a;
-            font-size: 0.88rem;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.25);
+            color: #F87171;
+            font-size: 0.85rem;
             text-align: center;
             display: none;
         }
 
-        .badge-admin {
-            display: inline-block;
-            background: rgba(255, 77, 41, 0.1);
-            border: 1px solid rgba(255, 77, 41, 0.3);
-            color: #ff4d29;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            padding: 3px 10px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
         .login-footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 28px;
             font-size: 0.78rem;
-            color: #555;
+            color: #6B7280;
         }
 
         .lang-bar {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 16px;
         }
     </style>
 </head>
@@ -180,10 +191,10 @@
 <body>
 
     <div class="login-card">
-        <p class="logo">Card<span>Studio</span></p>
+        <p class="logo"><div class="logo-icon">C</div> CardStudio</p>
         <p class="subtitle" data-i18n="login_panel_title">Panel de Administración</p>
-        <div style="text-align:center; margin-bottom: 30px;">
-            <span class="badge-admin" data-i18n="login_access_restricted">🔒 Acceso Restringido</span>
+        <div style="text-align:center; margin-bottom: 28px;">
+            <span class="badge-admin" data-i18n="login_access_restricted">Acceso Restringido</span>
         </div>
 
         <div class="field">
@@ -200,7 +211,7 @@
 
         <div id="errorMsg"></div>
 
-        <p class="login-footer" data-i18n="login_footer">CardStudio © 2025 — Solo personal autorizado</p>
+        <p class="login-footer">CardStudio &copy; 2025 — <span data-i18n="login_footer">Solo personal autorizado</span></p>
 
         <div class="lang-bar">
             <script>document.write(i18n.createSwitcher())</script>
@@ -255,7 +266,7 @@
 
         function mostrarError(msg) {
             const el = document.getElementById('errorMsg');
-            el.textContent = '⚠ ' + msg;
+            el.textContent = msg;
             el.style.display = 'block';
         }
     </script>

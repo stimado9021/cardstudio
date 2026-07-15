@@ -56,7 +56,7 @@ function añadirTexto() {
         x: 100, y: 100 + (textos.length * 40),
         size: 50,
         family: "Arial",
-        color: "#ff4d29",
+        color: "#2E90E5",
         angle: 0,
         hasBorder: false,
         bColor: "#ffffff",
@@ -82,7 +82,7 @@ function añadirParrafo() {
         x: 100, y: 100 + (textos.length * 40),
         size: 30,
         family: "Arial",
-        color: "#ff4d29",
+        color: "#2E90E5",
         angle: 0,
         hasBorder: false,
         bColor: "#ffffff",
@@ -225,7 +225,7 @@ function draw() {
 
         // Solo dibujamos el cuadro de selección si NO estamos exportando la imagen
         if (index === seleccionadoIdx) {
-            ctx.strokeStyle = "#ff4d29";
+            ctx.strokeStyle = "#2E90E5";
             ctx.setLineDash([5, 5]);
             ctx.strokeRect(t.x - 5, t.y - 5, t.width + 10, t.height + 10);
             ctx.setLineDash([]);
