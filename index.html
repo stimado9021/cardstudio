@@ -7,12 +7,12 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>CardStudio - Tarjetas Personalizadas</title>
+    <title>CardStudio - Invitaciones y Tarjetas Personalizadas</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/landing.css?v=3">
-    <script src="js/i18n.js?v=2"></script>
+    <link rel="stylesheet" href="css/landing.css?v=4">
+    <script src="js/i18n.js?v=3"></script>
 </head>
 
 <body>
@@ -24,11 +24,11 @@
             CardStudio
         </a>
         <div class="navbar-nav">
-            <a href="#como-funciona" class="nav-link" data-i18n="nav_how_it_works">Cómo funciona</a>
+            <a href="#categorias" class="nav-link" data-i18n="nav_categories">Categorías</a>
             <a href="#plantillas" class="nav-link" data-i18n="nav_templates">Plantillas</a>
             <a href="admin/login.php" class="nav-link" data-i18n="nav_admin">Admin</a>
             <script>document.write(i18n.createSwitcher())</script>
-            <a href="#plantillas" class="nav-cta" data-i18n="nav_get_started">Empezar ahora</a>
+            <a href="#plantillas" class="nav-cta" data-i18n="nav_get_started">Crear mi tarjeta</a>
         </div>
         <div class="nav-hamburger" onclick="toggleMobileMenu()">
             <span></span><span></span><span></span>
@@ -38,10 +38,10 @@
     <!-- ═══ MOBILE MENU ═══ -->
     <div class="mobile-menu" id="mobileMenu">
         <button class="mobile-menu-close" onclick="toggleMobileMenu()">&times;</button>
-        <a href="#como-funciona" onclick="toggleMobileMenu()" data-i18n="nav_how_it_works">Cómo funciona</a>
+        <a href="#categorias" onclick="toggleMobileMenu()" data-i18n="nav_categories">Categorías</a>
         <a href="#plantillas" onclick="toggleMobileMenu()" data-i18n="nav_templates">Plantillas</a>
         <a href="admin/login.php" data-i18n="nav_admin">Admin</a>
-        <a href="#plantillas" onclick="toggleMobileMenu()" data-i18n="nav_get_started">Empezar ahora</a>
+        <a href="#plantillas" onclick="toggleMobileMenu()" data-i18n="nav_get_started">Crear mi tarjeta</a>
         <div class="mobile-menu-socials">
             <script>document.write(i18n.createSwitcher())</script>
         </div>
@@ -50,102 +50,80 @@
     <!-- ═══ HERO ═══ -->
     <header class="hero">
         <div class="hero-bg">
-            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1600&q=80" alt="Personas creando juntas" loading="eager">
+            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1600&q=80" alt="Personas celebrando" loading="eager">
         </div>
         <div class="hero-content">
             <div class="hero-text">
-                <h1 data-i18n="hero_title">Crea tarjetas que cuentan tu historia</h1>
-                <p data-i18n="hero_subtitle">Elige una plantilla profesional, personalízala con tus mensajes y descarga tu tarjeta en segundos. Sin complicaciones.</p>
+                <h1 data-i18n="hero_title">Invitaciones y tarjetas que sorprenden</h1>
+                <p data-i18n="hero_subtitle">Elige una plantilla, personaliza el texto con nuestro editor visual y descarga tu tarjeta lista para imprimir. Solo $1 por diseño.</p>
                 <div class="hero-btns">
                     <a href="#plantillas" class="btn-hero-primary" data-i18n="hero_cta_primary">Ver plantillas</a>
-                    <a href="#como-funciona" class="btn-hero-secondary" data-i18n="hero_cta_secondary">Cómo funciona</a>
                 </div>
             </div>
             <div class="hero-widget">
-                <div class="hero-widget-badge">Premium Plan</div>
-                <h3 data-i18n="widget_title">Diseño personalizado</h3>
-                <p data-i18n="widget_desc">Accede a todas las plantillas y descarga sin marca de agua.</p>
+                <div class="hero-widget-badge" data-i18n="widget_badge">Vista previa en vivo</div>
+                <h3 data-i18n="widget_title">Personaliza tu tarjeta</h3>
+                <p data-i18n="widget_desc">Edita el texto y ve los cambios al instante en la tarjeta.</p>
                 <div class="widget-tabs">
-                    <button class="widget-tab active" data-i18n="widget_monthly">Mensual</button>
-                    <button class="widget-tab" data-i18n="widget_yearly">Anual</button>
+                    <button class="widget-tab active" data-i18n="widget_tab_text">Texto</button>
+                    <button class="widget-tab" data-i18n="widget_tab_style">Estilo</button>
                 </div>
                 <ul class="widget-checklist">
-                    <li><span class="check-icon">&#10003;</span> <span data-i18n="widget_feature_1">Todas las plantillas premium</span></li>
-                    <li><span class="check-icon">&#10003;</span> <span data-i18n="widget_feature_2">Descarga sin marca de agua</span></li>
-                    <li><span class="check-icon">&#10003;</span> <span data-i18n="widget_feature_3">Soporte prioritario</span></li>
-                    <li><span class="check-icon">&#10003;</span> <span data-i18n="widget_feature_4">Actualizaciones gratuitas</span></li>
+                    <li><span class="check-icon">&#10003;</span> <span data-i18n="widget_feature_1">40+ fuentes tipográficas profesionales</span></li>
+                    <li><span class="check-icon">&#10003;</span> <span data-i18n="widget_feature_2">Bordes, sombras y rotación de texto</span></li>
+                    <li><span class="check-icon">&#10003;</span> <span data-i18n="widget_feature_3">Vista previa en tiempo real</span></li>
+                    <li><span class="check-icon">&#10003;</span> <span data-i18n="widget_feature_4">Descarga en alta calidad por solo $1</span></li>
                 </ul>
             </div>
         </div>
     </header>
 
-    <!-- ═══ HOW IT WORKS ═══ -->
-    <section class="section section-light" id="como-funciona">
-        <div class="section-header">
-            <span class="section-label" data-i18n="how_label">Cómo funciona</span>
-            <h2 class="section-title" data-i18n="how_title">Tres pasos para tu tarjeta perfecta</h2>
-            <p class="section-desc" data-i18n="how_desc">Un proceso simple y rápido para crear tarjetas profesionales sin necesidad de diseño.</p>
-        </div>
-        <div class="steps-grid">
-            <div class="step-card">
-                <div class="step-icon">1</div>
-                <h3 data-i18n="step1_title">Elige una plantilla</h3>
-                <p data-i18n="step1_desc">Explora nuestra colección de diseños profesionales para toda ocasión.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-icon">2</div>
-                <h3 data-i18n="step2_title">Personaliza</h3>
-                <p data-i18n="step2_desc">Edita textos, colores y elementos directamente en nuestro editor visual.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-icon">3</div>
-                <h3 data-i18n="step3_title">Descarga</h3>
-                <p data-i18n="step3_desc">Obtén tu tarjeta en alta calidad, lista para imprimir o compartir digitalmente.</p>
-            </div>
-        </div>
-    </section>
 
-    <!-- ═══ FEATURE ROW 1 ═══ -->
+
+    <!-- ═══ FEATURE ROW 1: Editor ═══ -->
     <section class="section section-light">
         <div class="feature-row">
             <div class="feature-text">
-                <span class="section-label" data-i18n="feature1_label">Editor intuitivo</span>
-                <h2 data-i18n="feature1_title">Diseña como un profesional, sin serlo</h2>
-                <p data-i18n="feature1_desc">Nuestro editor visual te permite personalizar cada detalle de tu tarjeta con arrastrar y soltar.</p>
+                <span class="section-label" data-i18n="feature1_label">Editor visual</span>
+                <h2 data-i18n="feature1_title">Edita tu tarjeta como un diseñador profesional</h2>
+                <p data-i18n="feature1_desc">Nuestro editor te permite modificar cada detalle de la invitación: texto, fuentes, colores, sombras y posición.</p>
                 <ul class="feature-list">
-                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature1_li1">Múltiples fuentes tipográficas</span></li>
-                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature1_li2">Control total de colores y estilos</span></li>
-                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature1_li3">Vista previa en tiempo real</span></li>
+                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature1_li1">Arrastra el texto a donde quieras en la tarjeta</span></li>
+                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature1_li2">Más de 40 fuentes: desde elegantes hasta divertidas</span></li>
+                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature1_li3">Bordes, sombras, rotación y alineación de texto</span></li>
+                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature1_li4">Modo párrafo para dedicatorias y mensajes largos</span></li>
                 </ul>
             </div>
             <div class="feature-image">
                 <img src="https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=800&q=80" alt="Editor visual de tarjetas" loading="lazy">
                 <div class="feature-image-overlay">
                     <div class="overlay-icon">&#9998;</div>
-                    <span data-i18n="feature1_overlay">Personalización en tiempo real</span>
+                    <span data-i18n="feature1_overlay">Vista previa en tiempo real</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ═══ FEATURE ROW 2 ═══ -->
-    <section class="section section-subtle">
+    <!-- ═══ FEATURE ROW 2: Categorías ═══ -->
+    <section class="section section-subtle" id="categorias">
         <div class="feature-row reverse">
             <div class="feature-text">
-                <span class="section-label" data-i18n="feature2_label">Plantillas profesionales</span>
-                <h2 data-i18n="feature2_title">Diseños para cada ocasión</h2>
-                <p data-i18n="feature2_desc">Desde bodas y cumpleaños hasta eventos corporativos, tenemos el diseño perfecto para ti.</p>
+                <span class="section-label" data-i18n="feature2_label">Categorías</span>
+                <h2 data-i18n="feature2_title">Diseños para cada momento especial</h2>
+                <p data-i18n="feature2_desc">Tenemos plantillas organizadas por tipo de evento para que encuentres exactamente lo que necesitas.</p>
                 <ul class="feature-list">
-                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature2_li1">Colección en constante crecimiento</span></li>
-                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature2_li2">Calidad de impresión garantizada</span></li>
-                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature2_li3">Descarga en múltiples formatos</span></li>
+                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature2_li1">Bodas y matrimonios</span></li>
+                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature2_li2">Cumpleaños y baby showers</span></li>
+                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature2_li3">Bautizos y primera comunión</span></li>
+                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature2_li4">Graduaciones y agradecimiento</span></li>
+                    <li><span class="fl-icon">&#10003;</span> <span data-i18n="feature2_li5">Día de la Madre y del Padre</span></li>
                 </ul>
             </div>
             <div class="feature-image">
-                <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&q=80" alt="Galería de diseños" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&q=80" alt="Categorías de tarjetas" loading="lazy">
                 <div class="feature-image-overlay">
                     <div class="overlay-icon">&#9733;</div>
-                    <span data-i18n="feature2_overlay">Más de 50 plantillas disponibles</span>
+                    <span data-i18n="feature2_overlay">10 categorías disponibles</span>
                 </div>
             </div>
         </div>
@@ -155,8 +133,8 @@
     <section class="section section-light" id="plantillas">
         <div class="section-header">
             <span class="section-label" data-i18n="section_label">Catálogo</span>
-            <h2 class="section-title" data-i18n="section_title">Nuestras Plantillas</h2>
-            <p class="section-desc" data-i18n="section_desc">Explora nuestra colección y encuentra el diseño perfecto para tu próximo proyecto.</p>
+            <h2 class="section-title" data-i18n="section_title">Elige tu plantilla</h2>
+            <p class="section-desc" data-i18n="section_desc">Selecciona una plantilla para comenzar a personalizarla con tu texto y mensaje.</p>
         </div>
 
         <div class="gallery-container">
@@ -172,71 +150,19 @@
         </div>
     </section>
 
-    <!-- ═══ TESTIMONIALS ═══ -->
-    <section class="section section-dark">
-        <div class="section-header">
-            <span class="section-label" data-i18n="testimonials_label">Testimonios</span>
-            <h2 class="section-title" data-i18n="testimonials_title">Lo que dicen nuestros usuarios</h2>
-        </div>
-        <div class="testimonials-grid">
-            <div class="testimonial-card">
-                <div class="testimonial-quote" data-i18n="testimonial1">"Creé las invitaciones de mi boda en minutos. El resultado fue increíble y todos mis invitados preguntaron dónde las había hecho."</div>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar">M</div>
-                    <div>
-                        <div class="testimonial-name">María García</div>
-                        <div class="testimonial-role" data-i18n="testimonial1_role">Novia feliz</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-quote" data-i18n="testimonial2">"Como empresa, necesitábamos tarjetas de presentación rápidas y profesionales. CardStudio superó todas nuestras expectativas."</div>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar">C</div>
-                    <div>
-                        <div class="testimonial-name">Carlos Ruiz</div>
-                        <div class="testimonial-role" data-i18n="testimonial2_role">Director de Marketing</div>
-                    </div>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-quote" data-i18n="testimonial3">"La facilidad de uso es impresionante. No necesitas ser diseñador para crear algo hermoso. Lo recomiendo al 100%."</div>
-                <div class="testimonial-author">
-                    <div class="testimonial-avatar">L</div>
-                    <div>
-                        <div class="testimonial-name">Laura Martínez</div>
-                        <div class="testimonial-role" data-i18n="testimonial3_role">Emprendedora</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- ═══ CTA ═══ -->
-    <section class="cta-section">
-        <h2 data-i18n="cta_title">¿Listo para crear tu tarjeta?</h2>
-        <p data-i18n="cta_desc">Empieza ahora y diseña algo increíble en minutos.</p>
-        <a href="#plantillas" class="cta-btn" data-i18n="cta_btn">Empezar gratis</a>
-    </section>
 
     <!-- ═══ FOOTER ═══ -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
                 <h3>CardStudio</h3>
-                <p data-i18n="footer_desc">Creamos tarjetas personalizadas profesionales para cada ocasión de tu vida.</p>
+                <p data-i18n="footer_desc">Plataforma para crear invitaciones y tarjetas personalizadas para bodas, cumpleaños, bautizos y más.</p>
             </div>
             <div class="footer-col">
                 <h4 data-i18n="footer_product">Producto</h4>
                 <a href="#plantillas" data-i18n="footer_templates">Plantillas</a>
-                <a href="#como-funciona" data-i18n="footer_how">Cómo funciona</a>
-                <a href="#" data-i18n="footer_pricing">Precios</a>
-            </div>
-            <div class="footer-col">
-                <h4 data-i18n="footer_company">Empresa</h4>
-                <a href="#" data-i18n="footer_about">Sobre nosotros</a>
-                <a href="#" data-i18n="footer_contact">Contacto</a>
-                <a href="#" data-i18n="footer_blog">Blog</a>
+                <a href="#categorias" data-i18n="footer_categories">Categorías</a>
             </div>
             <div class="footer-col">
                 <h4 data-i18n="footer_support">Soporte</h4>
