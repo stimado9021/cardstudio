@@ -141,7 +141,7 @@ body {
 .canvas-container::before {
     content: '';
     position: absolute;
-    width: 500px;
+    width: 700px;
     height: 700px;
     background: radial-gradient(circle, rgba(46,144,229,0.12) 0%, transparent 70%);
     z-index: 0;

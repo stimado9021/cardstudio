@@ -11,6 +11,23 @@ let textos = [];
 let isLoggedIn = false;
 let hasPaid = false;
 
+function adaptCanvasToImage(img) {
+    const MAX_DIM = 700, MIN_DIM = 400;
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    if (!w || !h) return;
+    const ratio = w / h;
+    if (ratio >= 1) {
+        canvas.width = MAX_DIM;
+        canvas.height = Math.round(MAX_DIM / ratio);
+        if (canvas.height < MIN_DIM) { canvas.height = MIN_DIM; canvas.width = Math.round(MIN_DIM * ratio); }
+    } else {
+        canvas.height = MAX_DIM;
+        canvas.width = Math.round(MAX_DIM * ratio);
+        if (canvas.width < MIN_DIM) { canvas.width = MIN_DIM; canvas.height = Math.round(MIN_DIM / ratio); }
+    }
+}
+
 async function init() {
     if (!disenoId) return alert(i18n.t("alert_no_design"));
 
@@ -22,8 +39,7 @@ async function init() {
 
         fondoImg.src = `admin/${data.imagen_fondo_url}`;
         fondoImg.onload = async () => {
-            // Wait for ALL Google Fonts to be ready before drawing on Canvas
-            // Without this, Canvas ignores web fonts and falls back to a generic font
+            adaptCanvasToImage(fondoImg);
             await document.fonts.ready;
             draw();
         };

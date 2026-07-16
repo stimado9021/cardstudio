@@ -7,6 +7,23 @@ let isDragging = false;
 let offset = { x: 0, y: 0 }; // Para un arrastre suave
 let idDisenoActual = 0;
 
+function adaptCanvasToImage(img) {
+    const MAX_DIM = 700, MIN_DIM = 400;
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    if (!w || !h) return;
+    const ratio = w / h;
+    if (ratio >= 1) {
+        canvas.width = MAX_DIM;
+        canvas.height = Math.round(MAX_DIM / ratio);
+        if (canvas.height < MIN_DIM) { canvas.height = MIN_DIM; canvas.width = Math.round(MIN_DIM * ratio); }
+    } else {
+        canvas.height = MAX_DIM;
+        canvas.width = Math.round(MAX_DIM * ratio);
+        if (canvas.width < MIN_DIM) { canvas.width = MIN_DIM; canvas.height = Math.round(MIN_DIM / ratio); }
+    }
+}
+
 window.onload = async () => {
     // Cargar categorías dinámicas
     try {
@@ -36,6 +53,7 @@ window.onload = async () => {
                 textos = JSON.parse(diseno.configuracion_textos_json);
                 fondoImg.src = diseno.imagen_fondo_url; 
                 fondoImg.onload = async function() {
+                    adaptCanvasToImage(fondoImg);
                     await document.fonts.ready;
                     draw();
                     if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
@@ -419,7 +437,10 @@ document.querySelectorAll('.master-control').forEach(el => {
 
 document.getElementById('bgInput').onchange = (e) => {
     const reader = new FileReader();
-    reader.onload = (ev) => { fondoImg.src = ev.target.result; fondoImg.onload = draw; };
+    reader.onload = (ev) => {
+        fondoImg.src = ev.target.result;
+        fondoImg.onload = () => { adaptCanvasToImage(fondoImg); draw(); };
+    };
     reader.readAsDataURL(e.target.files[0]);
 };
 
@@ -469,11 +490,12 @@ function limpiarEditor() {
     seleccionadoIdx = null;
     idDisenoActual = 0;
     fondoImg = new Image();
+    canvas.width = 500;
+    canvas.height = 700;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     document.getElementById('nombreDiseno').value = "";
     document.getElementById('bgInput').value = "";
     draw();
-    // Limpiar URL si venimos de editar
     window.history.replaceState({}, document.title, window.location.pathname);
 }
 

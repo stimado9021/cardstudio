@@ -276,7 +276,7 @@ body.sidebar-collapsed .config-panel {
 .canvas-area::before {
     content: '';
     position: absolute;
-    width: 500px;
+    width: 700px;
     height: 700px;
     background: radial-gradient(circle, rgba(46,144,229,0.08) 0%, transparent 70%);
     z-index: 0;
@@ -287,6 +287,8 @@ body.sidebar-collapsed .config-panel {
 canvas {
     background: #fff;
     box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    max-width: 100%;
+    height: auto;
     border-radius: var(--radius-sm);
     cursor: default;
     position: relative;
