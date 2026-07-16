@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/crear-diseno.css?v=5">
+    <link rel="stylesheet" href="css/crear-diseno.css?v=6">
     <script src="../js/i18n.js"></script>
 
 </head>
@@ -264,15 +264,21 @@
             input.dispatchEvent(new Event('input'));
         }
 
-        // Bold/Italic toggles (cosmetic only, stored in state)
+        // Bold/Italic toggles — modify selected text
         let isBold = false, isItalic = false;
         function toggleBold() {
-            isBold = !isBold;
+            if (seleccionadoIdx === null) return;
+            textos[seleccionadoIdx].bold = !textos[seleccionadoIdx].bold;
+            isBold = textos[seleccionadoIdx].bold;
             document.getElementById('btnBold').classList.toggle('active', isBold);
+            draw();
         }
         function toggleItalic() {
-            isItalic = !isItalic;
+            if (seleccionadoIdx === null) return;
+            textos[seleccionadoIdx].italic = !textos[seleccionadoIdx].italic;
+            isItalic = textos[seleccionadoIdx].italic;
             document.getElementById('btnItalic').classList.toggle('active', isItalic);
+            draw();
         }
 
         // Alignment buttons

@@ -75,6 +75,8 @@ function añadirTexto() {
         size: 50,
         family: "Arial",
         color: "#2E90E5",
+        bold: true,
+        italic: false,
         angle: 0,
         hasBorder: false,
         bColor: "#ffffff",
@@ -101,6 +103,8 @@ function añadirParrafo() {
         size: 30,
         family: "Arial",
         color: "#2E90E5",
+        bold: false,
+        italic: false,
         angle: 0,
         hasBorder: false,
         bColor: "#ffffff",
@@ -151,6 +155,12 @@ function actualizarPanelControl() {
 
     document.getElementById('checkBorder').dispatchEvent(new Event('change'));
     document.getElementById('checkShadow').dispatchEvent(new Event('change'));
+
+    // Sync bold/italic buttons
+    isBold = t.bold || false;
+    isItalic = t.italic || false;
+    document.getElementById('btnBold').classList.toggle('active', isBold);
+    document.getElementById('btnItalic').classList.toggle('active', isItalic);
 
     // Update color swatch
     const swatch = document.getElementById('colorSwatch');
@@ -203,7 +213,9 @@ function draw() {
 
     textos.forEach((t, index) => {
         ctx.save();
-        ctx.font = `bold ${t.size}px ${t.family}`;
+        const weight = t.bold ? 'bold ' : '';
+        const style = t.italic ? 'italic ' : '';
+        ctx.font = `${style}${weight}${t.size}px ${t.family}`;
         
         let lines = [];
         let lineHeight = t.size * 1.2;
