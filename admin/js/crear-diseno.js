@@ -128,9 +128,7 @@ function eliminarCapa() {
     seleccionadoIdx = null;
     draw();
     
-    document.getElementById('textoInput').value = "";
     document.getElementById('groupMaxWidth').style.display = 'none';
-    document.getElementById('groupAlign').style.display = 'none';
     if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
 }
 
@@ -138,7 +136,6 @@ function actualizarPanelControl() {
     if (seleccionadoIdx === null) return;
     const t = textos[seleccionadoIdx];
     
-    document.getElementById('textoInput').value = t.contenido;
     document.getElementById('fontFamily').value = t.family;
     document.getElementById('fontSize').value = t.size;
     document.getElementById('fontColor').value = t.color;
@@ -155,18 +152,22 @@ function actualizarPanelControl() {
     document.getElementById('checkBorder').dispatchEvent(new Event('change'));
     document.getElementById('checkShadow').dispatchEvent(new Event('change'));
 
-    document.getElementById('fontColorHex').textContent = t.color;
+    // Update color swatch
+    const swatch = document.getElementById('colorSwatch');
+    if (swatch) swatch.style.background = t.color;
+    
+    // Update alignment buttons
+    document.querySelectorAll('.toolbar-btn-align').forEach(b => b.classList.remove('active'));
+    const alignBtn = document.getElementById('btnAlign' + (t.align || 'left').charAt(0).toUpperCase() + (t.align || 'left').slice(1));
+    if (alignBtn) alignBtn.classList.add('active');
     
     const groupMaxWidth = document.getElementById('groupMaxWidth');
-    const groupAlign = document.getElementById('groupAlign');
     if (t.type === 'paragraph') {
         groupMaxWidth.style.display = 'block';
-        groupAlign.style.display = 'block';
         document.getElementById('maxWidthInput').value = t.maxWidth;
         document.getElementById('textAlign').value = t.align || 'left';
     } else {
         groupMaxWidth.style.display = 'none';
-        groupAlign.style.display = 'none';
     }
 }
 
@@ -174,9 +175,8 @@ function capturarCambios() {
     if (seleccionadoIdx === null) return;
     const t = textos[seleccionadoIdx];
 
-    t.contenido = document.getElementById('textoInput').value;
     t.family = document.getElementById('fontFamily').value;
-    t.size = parseInt(document.getElementById('fontSize').value);
+    t.size = parseInt(document.getElementById('fontSize').value) || 50;
     t.color = document.getElementById('fontColor').value;
     t.angle = parseFloat(document.getElementById('anguloInput').value);
     t.hasBorder = document.getElementById('checkBorder').checked;

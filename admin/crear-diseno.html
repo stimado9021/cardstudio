@@ -18,13 +18,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/crear-diseno.css?v=3">
+    <link rel="stylesheet" href="css/crear-diseno.css?v=5">
     <script src="../js/i18n.js"></script>
 
 </head>
 
 <body>
 
+    <!-- ═══ SIDEBAR (nav only) ═══ -->
     <div class="sidebar" id="mainSidebar">
         <div class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Colapsar / Expandir">&#9776;</div>
         <div class="logo"><div class="logo-icon">C</div> <span class="logo-text">CardStudio</span></div>
@@ -46,225 +47,170 @@
         <div class="mobile-tab" id="tab-canvas" onclick="switchTab('canvas')" data-i18n="admin_tab_canvas">🖼️ Lienzo</div>
     </div>
 
-    <div class="config-panel">
-        <div class="config-scroll">
+    <!-- ═══ MAIN EDITOR AREA ═══ -->
+    <div class="editor-main">
 
-            <!-- ═══ GENERAL ═══ -->
-            <h3>⚙️ <span data-i18n="admin_general">General</span></h3>
-
-            <div class="control-group">
-                <label data-i18n="admin_design_name">Nombre del Diseño</label>
-                <input type="text" id="nombreDiseno" placeholder="Ej: Invitación Boda - Oro">
-            </div>
-
-            <div class="control-group">
-                <label data-i18n="admin_category">Categoría</label>
-                <select id="categoriaSelect"></select>
-            </div>
-
-            <div class="control-group">
-                <label data-i18n="admin_bg_image">Imagen de Fondo</label>
-                <input type="file" id="bgInput" class="btn-archivo" accept="image/*">
-            </div>
-
-            <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-                <button class="btn-add" style="flex: 1;" onclick="añadirTexto()">+ <span data-i18n="admin_add_layer">Texto</span></button>
-                <button class="btn-add-paragraph" style="flex: 1;" onclick="añadirParrafo()">+ <span>Párrafo</span></button>
-            </div>
-
-            <!-- ═══ QUICK INFO ═══ -->
-            <div class="quick-info" id="quickInfo" style="display:none;">
-                <div class="info-item">
-                    <span class="info-value" id="infoLayerCount">0</span>
-                    <span class="info-label">Capas</span>
+        <!-- ═══ TOP CONFIG BAR ═══ -->
+        <div class="config-bar">
+            <div class="config-bar-row">
+                <div class="config-field">
+                    <label data-i18n="admin_design_name">Nombre</label>
+                    <input type="text" id="nombreDiseno" placeholder="Ej: Invitación Boda">
                 </div>
-                <div class="info-item">
-                    <span class="info-value" id="infoSelected">—</span>
-                    <span class="info-label">Seleccionada</span>
+                <div class="config-field">
+                    <label data-i18n="admin_category">Categoría</label>
+                    <select id="categoriaSelect"></select>
                 </div>
-                <div class="info-item">
-                    <span class="info-value" id="infoFontSize">—</span>
-                    <span class="info-label">Tamaño</span>
+                <div class="config-field">
+                    <label data-i18n="admin_bg_image">Fondo</label>
+                    <input type="file" id="bgInput" class="btn-archivo" accept="image/*">
+                </div>
+                <div class="config-actions">
+                    <button class="btn-add" onclick="añadirTexto()">+ Texto</button>
+                    <button class="btn-add-paragraph" onclick="añadirParrafo()">+ Párrafo</button>
+                    <button class="btn-delete-sm" onclick="eliminarCapa()">🗑️</button>
                 </div>
             </div>
+        </div>
 
-            <hr>
+        <!-- ═══ CANVAS AREA ═══ -->
+        <div class="canvas-area">
 
-            <!-- ═══ SECTION: TEXTO ═══ -->
-            <div class="section section-text">
-                <div class="section-header open" onclick="toggleSection(this)">
-                    <span class="section-title"><span class="section-icon">✏️</span> Texto</span>
-                    <span class="section-arrow">▼</span>
-                </div>
-                <div class="section-body open">
-                    <div class="control-group">
-                        <label data-i18n="admin_text_content">Contenido</label>
-                        <textarea id="textoInput" class="master-control" placeholder="Escribe aquí..." rows="3"></textarea>
+            <!-- ═══ FLOATING TOOLBAR ═══ -->
+            <div class="floating-toolbar" id="floatingToolbar">
+                <div class="toolbar-row">
+                    <select id="fontFamily" class="toolbar-font-select master-control">
+                        <option value="Arial">Arial</option>
+                        <option value="'Playfair Display', serif">Playfair Display</option>
+                        <option value="'Bebas Neue', cursive">Bebas Neue</option>
+                        <option value="'Lobster', cursive">Lobster</option>
+                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'Lora', serif">Lora</option>
+                        <option value="'Dancing Script', cursive">Dancing Script</option>
+                        <option value="'Pacifico', cursive">Pacifico</option>
+                        <option value="'Cinzel', serif">Cinzel</option>
+                        <option value="'Great Vibes', cursive">Great Vibes</option>
+                        <option value="'Oswald', sans-serif">Oswald</option>
+                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                        <option value="'Sacramento', cursive">Sacramento</option>
+                        <option value="'Alex Brush', cursive">Alex Brush</option>
+                        <option value="'Satisfy', cursive">Satisfy</option>
+                        <option value="'Cormorant Garamond', serif">Cormorant Garamond</option>
+                        <option value="'Caveat', cursive">Caveat</option>
+                        <option value="'Fredoka One', cursive">Fredoka One</option>
+                        <option value="'Nunito', sans-serif">Nunito</option>
+                        <option value="'Bubblegum Sans', cursive">Bubblegum Sans</option>
+                        <option value="'Quicksand', sans-serif">Quicksand</option>
+                        <option value="'Raleway', sans-serif">Raleway</option>
+                        <option value="'Lato', sans-serif">Lato</option>
+                        <option value="'Poppins', sans-serif">Poppins</option>
+                        <option value="'Adine Kirnberg', cursive">Adine Kirnberg</option>
+                        <option value="'Batman Forever Alternate', sans-serif">Batman Forever</option>
+                        <option value="'Bauhaus 93', sans-serif">Bauhaus 93</option>
+                        <option value="'Agent Orange', cursive">Agent Orange</option>
+                        <option value="'Antiqua', serif">Antigua</option>
+                    </select>
+
+                    <div class="toolbar-sep"></div>
+
+                    <div class="toolbar-size-group">
+                        <button class="toolbar-btn-sm" onclick="changeFontSize(-2)">−</button>
+                        <input type="number" id="fontSize" class="toolbar-size-input master-control" min="10" max="250" value="50">
+                        <button class="toolbar-btn-sm" onclick="changeFontSize(2)">+</button>
                     </div>
 
-                    <div class="control-group">
-                        <label data-i18n="admin_font">FUENTE</label>
-                        <select id="fontFamily" onchange="cambiarFuente(this.value)" class="master-control">
-                            <option value="Arial">Arial</option>
-                            <option value="'Playfair Display', serif">Playfair Display</option>
-                            <option value="'Bebas Neue', cursive">Bebas Neue</option>
-                            <option value="'Lobster', cursive">Lobster</option>
-                            <option value="'Montserrat', sans-serif">Montserrat</option>
-                            <option value="'Roboto', sans-serif">Roboto</option>
-                            <option value="'Lora', serif">Lora</option>
-                            <option value="'Dancing Script', cursive">Dancing Script</option>
-                            <option value="'Pacifico', cursive">Pacifico</option>
-                            <option value="'Cinzel', serif">Cinzel</option>
-                            <option value="'Great Vibes', cursive">Great Vibes</option>
-                            <option value="'Oswald', sans-serif">Oswald</option>
-                            <option value="'Open Sans', sans-serif">Open Sans</option>
-                            <option value="'Sacramento', cursive">Sacramento</option>
-                            <option value="'Alex Brush', cursive">Alex Brush</option>
-                            <option value="'Satisfy', cursive">Satisfy</option>
-                            <option value="'Cormorant Garamond', serif">Cormorant Garamond</option>
-                            <option value="'Caveat', cursive">Caveat</option>
-                            <option value="'Fredoka One', cursive">Fredoka One</option>
-                            <option value="'Nunito', sans-serif">Nunito</option>
-                            <option value="'Bubblegum Sans', cursive">Bubblegum Sans</option>
-                            <option value="'Quicksand', sans-serif">Quicksand</option>
-                            <option value="'Raleway', sans-serif">Raleway</option>
-                            <option value="'Lato', sans-serif">Lato</option>
-                            <option value="'Poppins', sans-serif">Poppins</option>
-                            <option value="'Adine Kirnberg', cursive">Adine Kirnberg</option>
-                            <option value="'Batman Forever Alternate', sans-serif">Batman Forever</option>
-                            <option value="'Bauhaus 93', sans-serif">Bauhaus 93</option>
-                            <option value="'Agent Orange', cursive">Agent Orange</option>
-                            <option value="'Antiqua', serif">Antigua</option>
-                        </select>
-                    </div>
+                    <div class="toolbar-sep"></div>
 
-                    <div class="control-group">
-                        <label data-i18n="admin_fill_color">Color de Relleno</label>
-                        <div style="display:flex; gap:10px; align-items:center;">
-                            <input type="color" id="fontColor" class="master-control" value="#2E90E5">
-                            <span id="fontColorHex" style="font-size:0.75rem; color:var(--text-secondary-dark);">#2E90E5</span>
-                        </div>
-                    </div>
+                    <button class="toolbar-btn" id="btnBold" onclick="toggleBold()"><b>B</b></button>
+                    <button class="toolbar-btn" id="btnItalic" onclick="toggleItalic()"><i>I</i></button>
+
+                    <div class="toolbar-sep"></div>
+
+                    <label class="toolbar-color-label">
+                        <input type="color" id="fontColor" class="master-control toolbar-color-input" value="#2E90E5">
+                        <span class="toolbar-color-swatch" id="colorSwatch"></span>
+                    </label>
+
+                    <div class="toolbar-sep"></div>
+
+                    <button class="toolbar-btn toolbar-btn-align" id="btnAlignLeft" onclick="setAlign('left')">≡</button>
+                    <button class="toolbar-btn toolbar-btn-align" id="btnAlignCenter" onclick="setAlign('center')">≡</button>
+                    <button class="toolbar-btn toolbar-btn-align" id="btnAlignRight" onclick="setAlign('right')">≡</button>
+
+                    <div class="toolbar-sep"></div>
+
+                    <button class="toolbar-btn-advanced" id="btnAdvanced" onclick="toggleAdvancedPanel()">⚙️</button>
                 </div>
             </div>
 
-            <!-- ═══ SECTION: TAMAÑO / ÁNGULO ═══ -->
-            <div class="section section-style">
-                <div class="section-header open" onclick="toggleSection(this)">
-                    <span class="section-title"><span class="section-icon">📐</span> Tamaño y Ángulo</span>
-                    <span class="section-arrow">▼</span>
+            <!-- ═══ ADVANCED PANEL (popup) ═══ -->
+            <div class="advanced-panel" id="advancedPanel" style="display:none;">
+                <div class="advanced-panel-header">
+                    <span>Efectos de texto</span>
+                    <button class="advanced-close" onclick="toggleAdvancedPanel()">×</button>
                 </div>
-                <div class="section-body open">
-                    <div class="control-group">
-                        <div class="dual-control">
-                            <span>T:</span> <input type="range" id="fontSize" class="master-control" min="10" max="250" value="50">
-                        </div>
-                        <div class="dual-control">
-                            <span>A:</span> <input type="range" id="anguloInput" class="master-control" min="-3.14" max="3.14" step="0.05">
-                        </div>
+                <div class="advanced-panel-body">
+                    <!-- Ángulo -->
+                    <div class="adv-group">
+                        <label>Rotación</label>
+                        <input type="range" id="anguloInput" class="master-control" min="-3.14" max="3.14" step="0.05">
                     </div>
-
-                    <div class="control-group" id="groupMaxWidth" style="display: none;">
-                        <label>Ancho del Párrafo</label>
-                        <div class="dual-control">
-                            <span>W:</span> <input type="range" id="maxWidthInput" class="master-control" min="50" max="450" value="300">
-                        </div>
-                    </div>
-
-                    <div class="control-group" id="groupAlign" style="display: none;">
-                        <label>Alineación</label>
-                        <select id="textAlign" class="master-control">
-                            <option value="left">Izquierda</option>
-                            <option value="center">Centro</option>
-                            <option value="right">Derecha</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ═══ SECTION: EFECTOS ═══ -->
-            <div class="section section-effects">
-                <div class="section-header" onclick="toggleSection(this)">
-                    <span class="section-title"><span class="section-icon">✨</span> Efectos</span>
-                    <span class="section-arrow">▼</span>
-                </div>
-                <div class="section-body">
-
                     <!-- Borde -->
-                    <div class="control-group">
-                        <div class="toggle-row">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="checkBorder" class="master-control">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span class="toggle-label" data-i18n="admin_enable_border">Borde del Texto</span>
-                        </div>
-                        <div id="borderControls" style="display:none;">
-                            <div class="dual-control">
+                    <div class="adv-group">
+                        <label class="adv-toggle">
+                            <input type="checkbox" id="checkBorder" class="master-control">
+                            <span>Borde</span>
+                        </label>
+                        <div id="borderControls" class="adv-sub" style="display:none;">
+                            <div class="adv-row">
                                 <input type="color" id="borderColor" class="master-control" value="#ffffff">
                                 <input type="range" id="borderWidth" class="master-control" min="0" max="15" step="0.5" value="2">
                             </div>
                         </div>
                     </div>
-
-                    <hr>
-
                     <!-- Sombra -->
-                    <div class="control-group">
-                        <div class="toggle-row">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="checkShadow" class="master-control">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span class="toggle-label" data-i18n="admin_enable_shadow">Sombra</span>
-                        </div>
-                        <div id="shadowControls" style="display:none;">
-                            <div class="control-group">
-                                <label>Color y Difuminado</label>
-                                <div class="dual-control">
-                                    <input type="color" id="shadowColor" class="master-control" value="#000000">
-                                    <input type="range" id="shadowBlur" class="master-control" min="0" max="30" value="10">
-                                </div>
+                    <div class="adv-group">
+                        <label class="adv-toggle">
+                            <input type="checkbox" id="checkShadow" class="master-control">
+                            <span>Sombra</span>
+                        </label>
+                        <div id="shadowControls" class="adv-sub" style="display:none;">
+                            <div class="adv-row">
+                                <input type="color" id="shadowColor" class="master-control" value="#000000">
+                                <input type="range" id="shadowBlur" class="master-control" min="0" max="30" value="10" title="Difuminado">
                             </div>
-                            <div class="control-group">
-                                <label>Posición (X / Y)</label>
-                                <div class="dual-control">
-                                    <span>X:</span> <input type="range" id="shadowX" class="master-control" min="-30" max="30" value="5">
-                                </div>
-                                <div class="dual-control">
-                                    <span>Y:</span> <input type="range" id="shadowY" class="master-control" min="-30" max="30" value="5">
-                                </div>
+                            <div class="adv-row">
+                                <span class="adv-label">X:</span>
+                                <input type="range" id="shadowX" class="master-control" min="-30" max="30" value="5">
+                                <span class="adv-label">Y:</span>
+                                <input type="range" id="shadowY" class="master-control" min="-30" max="30" value="5">
                             </div>
                         </div>
                     </div>
-
+                    <!-- Ancho párrafo -->
+                    <div class="adv-group" id="groupMaxWidth" style="display: none;">
+                        <label>Ancho del texto</label>
+                        <input type="range" id="maxWidthInput" class="master-control" min="50" max="450" value="300">
+                    </div>
                 </div>
             </div>
 
-            <hr>
+            <!-- Canvas -->
+            <canvas id="tarjetaCanvas" width="500" height="700"></canvas>
 
-            <!-- Delete button -->
-            <button class="btn-delete" onclick="eliminarCapa()">🗑️ Eliminar capa seleccionada</button>
-
-        </div>
-
-        <!-- Layer Panel -->
-        <div class="layer-panel" id="layerPanel">
-            <div class="layer-panel-header">
-                <span>📑 CAPAS</span>
-                <span id="layerCount" style="color:var(--brand);">0</span>
+            <!-- Layer bar -->
+            <div class="layer-bar" id="layerBar">
+                <div class="layer-bar-items" id="layerList"></div>
+                <span class="layer-count" id="layerCount">0</span>
             </div>
-            <div id="layerList"></div>
-        </div>
 
-        <!-- Save Bar -->
-        <div class="save-bar">
-            <button id="btnGuardar" class="btn-save">💾 <span data-i18n="admin_btn_save">GUARDAR DISEÑO</span></button>
-        </div>
-    </div>
+            <!-- Save bar -->
+            <div class="save-bar-floating">
+                <button id="btnGuardar" class="btn-save">💾 <span data-i18n="admin_btn_save">GUARDAR</span></button>
+            </div>
 
-    <div class="canvas-area">
-        <canvas id="tarjetaCanvas" width="500" height="700"></canvas>
+        </div>
     </div>
 
     <script src="js/crear-diseno.js"></script>
@@ -276,7 +222,6 @@
     </div>
 
     <script>
-        // Toggle sidebar collapsed/expanded
         function toggleSidebar() {
             const sidebar = document.getElementById('mainSidebar');
             sidebar.classList.toggle('collapsed');
@@ -285,21 +230,19 @@
             icon.textContent = sidebar.classList.contains('collapsed') ? '▶' : '☰';
         }
 
-        // Auto-collapse sidebar on editor page
         if (window.innerWidth > 1024) {
             document.getElementById('mainSidebar').classList.add('collapsed');
             document.body.classList.add('sidebar-collapsed');
             document.getElementById('sidebarToggle').textContent = '▶';
         }
 
-        // Toggle sections
-        function toggleSection(header) {
-            header.classList.toggle('open');
-            const body = header.nextElementSibling;
-            body.classList.toggle('open');
+        // Toggle advanced panel
+        function toggleAdvancedPanel() {
+            const panel = document.getElementById('advancedPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
         }
 
-        // Toggle border/shadow controls visibility
+        // Toggle border/shadow controls
         document.getElementById('checkBorder').addEventListener('change', function() {
             document.getElementById('borderControls').style.display = this.checked ? 'block' : 'none';
         });
@@ -307,36 +250,90 @@
             document.getElementById('shadowControls').style.display = this.checked ? 'block' : 'none';
         });
 
-        // Update hex display when color changes
+        // Color swatch sync
         document.getElementById('fontColor').addEventListener('input', function() {
-            document.getElementById('fontColorHex').textContent = this.value;
+            document.getElementById('colorSwatch').style.background = this.value;
         });
 
-        // Refresh layer panel & info
+        // Font size +/- buttons
+        function changeFontSize(delta) {
+            const input = document.getElementById('fontSize');
+            let val = parseInt(input.value) || 50;
+            val = Math.max(10, Math.min(250, val + delta));
+            input.value = val;
+            input.dispatchEvent(new Event('input'));
+        }
+
+        // Bold/Italic toggles (cosmetic only, stored in state)
+        let isBold = false, isItalic = false;
+        function toggleBold() {
+            isBold = !isBold;
+            document.getElementById('btnBold').classList.toggle('active', isBold);
+        }
+        function toggleItalic() {
+            isItalic = !isItalic;
+            document.getElementById('btnItalic').classList.toggle('active', isItalic);
+        }
+
+        // Alignment buttons
+        function setAlign(align) {
+            const sel = document.getElementById('textAlign');
+            if (sel) sel.value = align;
+            if (seleccionadoIdx !== null && textos[seleccionadoIdx]) {
+                textos[seleccionadoIdx].align = align;
+                draw();
+            }
+            document.querySelectorAll('.toolbar-btn-align').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById('btnAlign' + align.charAt(0).toUpperCase() + align.slice(1));
+            if (btn) btn.classList.add('active');
+        }
+
+        // Hidden textAlign select for compatibility
+        if (!document.getElementById('textAlign')) {
+            const sel = document.createElement('select');
+            sel.id = 'textAlign';
+            sel.className = 'master-control';
+            sel.style.display = 'none';
+            sel.innerHTML = '<option value="left">Izq</option><option value="center">Centro</option><option value="right">Der</option>';
+            document.body.appendChild(sel);
+        }
+
+        // Tab system for mobile
+        function switchTab(tab) {
+            const configBar = document.querySelector('.config-bar');
+            const canvasArea = document.querySelector('.canvas-area');
+            const tabConfig = document.getElementById('tab-config');
+            const tabCanvas = document.getElementById('tab-canvas');
+
+            if (tab === 'config') {
+                configBar.classList.add('tab-active');
+                canvasArea.classList.remove('tab-active');
+                tabConfig.classList.add('active');
+                tabCanvas.classList.remove('active');
+            } else {
+                canvasArea.classList.add('tab-active');
+                configBar.classList.remove('tab-active');
+                tabCanvas.classList.add('active');
+                tabConfig.classList.remove('active');
+            }
+        }
+
+        if (window.innerWidth <= 1024) {
+            document.querySelector('.config-bar').classList.add('tab-active');
+        }
+
+        // Refresh layer bar
         function refreshLayerPanel() {
             const list = document.getElementById('layerList');
             const countEl = document.getElementById('layerCount');
-            const quickInfo = document.getElementById('quickInfo');
             countEl.textContent = textos.length;
-
-            if (textos.length > 0) {
-                quickInfo.style.display = 'flex';
-                document.getElementById('infoLayerCount').textContent = textos.length;
-            } else {
-                quickInfo.style.display = 'none';
-            }
 
             list.innerHTML = '';
             textos.forEach((t, i) => {
                 const item = document.createElement('div');
-                item.className = 'layer-item' + (i === seleccionadoIdx ? ' active' : '');
-                const preview = (t.contenido || '').substring(0, 20) + ((t.contenido || '').length > 20 ? '...' : '');
-                const typeLabel = t.type === 'paragraph' ? '¶' : 'T';
-                item.innerHTML = `
-                    <span class="layer-num">${i + 1}</span>
-                    <span class="layer-text">${preview}</span>
-                    <span class="layer-type">${typeLabel} ${Math.round(t.size)}px</span>
-                `;
+                item.className = 'layer-chip' + (i === seleccionadoIdx ? ' active' : '');
+                const preview = (t.contenido || '').substring(0, 15) + ((t.contenido || '').length > 15 ? '…' : '');
+                item.innerHTML = `<span class="layer-chip-num">${i + 1}</span> ${preview}`;
                 item.onclick = () => {
                     seleccionadoIdx = i;
                     actualizarPanelControl();
@@ -345,38 +342,6 @@
                 };
                 list.appendChild(item);
             });
-
-            if (seleccionadoIdx !== null && textos[seleccionadoIdx]) {
-                document.getElementById('infoSelected').textContent = '#' + (seleccionadoIdx + 1);
-                document.getElementById('infoFontSize').textContent = textos[seleccionadoIdx].size + 'px';
-            } else {
-                document.getElementById('infoSelected').textContent = '—';
-                document.getElementById('infoFontSize').textContent = '—';
-            }
-        }
-
-        // Tab system for mobile
-        function switchTab(tab) {
-            const configPanel = document.querySelector('.config-panel');
-            const canvasArea  = document.querySelector('.canvas-area');
-            const tabConfig   = document.getElementById('tab-config');
-            const tabCanvas   = document.getElementById('tab-canvas');
-
-            if (tab === 'config') {
-                configPanel.classList.add('tab-active');
-                canvasArea.classList.remove('tab-active');
-                tabConfig.classList.add('active');
-                tabCanvas.classList.remove('active');
-            } else {
-                canvasArea.classList.add('tab-active');
-                configPanel.classList.remove('tab-active');
-                tabCanvas.classList.add('active');
-                tabConfig.classList.remove('active');
-            }
-        }
-
-        if (window.innerWidth <= 1024) {
-            document.querySelector('.config-panel').classList.add('tab-active');
         }
     </script>
 </body>
