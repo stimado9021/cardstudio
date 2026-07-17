@@ -146,13 +146,19 @@ function hitTest(t, px, py) {
 
 // ─── PANEL CONTROL ────────────────────────────────────────────────────
 function actualizarPanelControl() {
+    console.log('[EDITOR] actualizarPanelControl called, seleccionadoIdx:', seleccionadoIdx);
     if (seleccionadoIdx === null) return;
     const t = textos[seleccionadoIdx];
-    if (!t) return;
+    if (!t) { console.log('[EDITOR] text object not found at index', seleccionadoIdx); return; }
 
+    console.log('[EDITOR] Setting textarea value to:', t.contenido);
     const textarea = document.getElementById('textEditInput');
+    console.log('[EDITOR] textarea element:', textarea);
     if (textarea) {
         textarea.value = t.contenido || '';
+        console.log('[EDITOR] textarea.value set to:', textarea.value);
+    } else {
+        console.error('[EDITOR] textEditInput NOT FOUND in DOM');
     }
 
     const ff = document.getElementById('fontFamily');
@@ -286,8 +292,11 @@ function capturarCambios() {
 
 // ─── AÑADIR / ELIMINAR ────────────────────────────────────────────────
 function añadirTexto() {
+    console.log('[EDITOR] añadirTexto called');
+    const contenido = i18n.t("label_text") + " " + (textos.length + 1);
+    console.log('[EDITOR] contenido:', contenido);
     const nuevo = {
-        contenido: i18n.t("label_text") + " " + (textos.length + 1),
+        contenido: contenido,
         x: 100, y: 100 + (textos.length * 40),
         size: 50,
         family: "Arial",
@@ -359,9 +368,12 @@ function eliminarCapa() {
 canvas.addEventListener('mousedown', (e) => {
     e.preventDefault();
     const { x: mx, y: my } = getCanvasPos(e);
+    console.log('[EDITOR] mousedown at canvas coords:', mx, my, 'texts:', textos.length);
     let encontrado = false;
     for (let i = textos.length - 1; i >= 0; i--) {
-        if (hitTest(textos[i], mx, my)) {
+        const ht = hitTest(textos[i], mx, my);
+        console.log('[EDITOR] hitTest[' + i + ']:', ht, 'w:' + textos[i].width, 'h:' + textos[i].height, 'x:' + textos[i].x, 'y:' + textos[i].y);
+        if (ht) {
             seleccionadoIdx = i;
             isDragging = true;
             offset.x = mx - textos[i].x;
@@ -375,6 +387,7 @@ canvas.addEventListener('mousedown', (e) => {
         }
     }
     if (!encontrado) {
+        console.log('[EDITOR] No text hit — deselecting');
         seleccionadoIdx = null;
         const textarea = document.getElementById('textEditInput');
         if (textarea) textarea.value = '';
@@ -449,6 +462,7 @@ canvas.addEventListener('touchend', () => {
 
 // ─── TOOLBAR EVENT LISTENERS ──────────────────────────────────────────
 function initToolbarListeners() {
+    console.log('[EDITOR] initToolbarListeners called');
     // Hidden textAlign select for paragraph alignment
     if (!document.getElementById('textAlign')) {
         const sel = document.createElement('select');
@@ -460,6 +474,7 @@ function initToolbarListeners() {
 
     // Textarea
     const textarea = document.getElementById('textEditInput');
+    console.log('[EDITOR] textarea found in initToolbar:', !!textarea);
     if (textarea) {
         textarea.addEventListener('input', function() {
             if (seleccionadoIdx !== null && textos[seleccionadoIdx]) {
@@ -641,6 +656,7 @@ function logout() {
 
 // ─── INIT ─────────────────────────────────────────────────────────────
 window.onload = async () => {
+    console.log('[EDITOR] window.onload fired');
     try {
         const resp = await fetch('api.php?action=get_categorias');
         const categorias = await resp.json();
