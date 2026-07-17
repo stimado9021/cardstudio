@@ -140,7 +140,7 @@ function actualizarPanelControl() {
     if (seleccionadoIdx === null) return;
     const t = textos[seleccionadoIdx];
     
-    document.getElementById('textContent').value = t.contenido;
+    document.getElementById('textEditInput').value = t.contenido;
     document.getElementById('fontFamily').value = t.family;
     document.getElementById('fontSize').value = t.size;
     document.getElementById('fontColor').value = t.color;
@@ -187,7 +187,7 @@ function capturarCambios() {
     const t = textos[seleccionadoIdx];
 
     t.family = document.getElementById('fontFamily').value;
-    t.contenido = document.getElementById('textContent').value;
+    t.contenido = document.getElementById('textEditInput').value;
     t.size = parseInt(document.getElementById('fontSize').value) || 50;
     t.color = document.getElementById('fontColor').value;
     t.angle = parseFloat(document.getElementById('anguloInput').value);
@@ -448,6 +448,8 @@ document.querySelectorAll('.master-control').forEach(el => {
     el.addEventListener('input', capturarCambios);
     el.addEventListener('change', capturarCambios);
 });
+
+document.getElementById('textEditInput').addEventListener('input', capturarCambios);
 
 document.getElementById('bgInput').onchange = (e) => {
     const reader = new FileReader();
