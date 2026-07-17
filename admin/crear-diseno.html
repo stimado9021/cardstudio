@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/crear-diseno.css?v=7">
+    <link rel="stylesheet" href="css/crear-diseno.css?v=8">
     <script src="../js/i18n.js"></script>
 
 </head>
@@ -157,54 +157,52 @@
 
                 <div class="rt-sep"></div>
 
-                <button class="toolbar-btn-advanced" id="btnAdvanced" onclick="toggleAdvancedPanel()">⚙️</button>
+                <label class="rt-label">Rotación</label>
+                <div class="rt-slider-row">
+                    <input type="range" id="anguloInput" class="master-control rt-range" min="-3.14" max="3.14" step="0.05">
+                </div>
 
-                <!-- ═══ ADVANCED PANEL ═══ -->
-                <div class="advanced-panel" id="advancedPanel" style="display:none;">
-                    <div class="advanced-panel-header">
-                        <span>Efectos de texto</span>
-                        <button class="advanced-close" onclick="toggleAdvancedPanel()">×</button>
+                <div class="rt-sep"></div>
+
+                <label class="rt-label">Borde</label>
+                <div class="rt-toggle-row">
+                    <label class="rt-toggle">
+                        <input type="checkbox" id="checkBorder" class="master-control">
+                        <span class="rt-toggle-track"></span>
+                    </label>
+                    <div class="rt-inline-controls" id="borderControls" style="display:none;">
+                        <input type="color" id="borderColor" class="master-control rt-color-sm" value="#ffffff">
+                        <input type="range" id="borderWidth" class="master-control rt-range" min="0" max="15" step="0.5" value="2">
                     </div>
-                    <div class="advanced-panel-body">
-                        <div class="adv-group">
-                            <label>Rotación</label>
-                            <input type="range" id="anguloInput" class="master-control" min="-3.14" max="3.14" step="0.05">
+                </div>
+
+                <div class="rt-sep"></div>
+
+                <label class="rt-label">Sombra</label>
+                <div class="rt-toggle-row">
+                    <label class="rt-toggle">
+                        <input type="checkbox" id="checkShadow" class="master-control">
+                        <span class="rt-toggle-track"></span>
+                    </label>
+                    <div class="rt-inline-controls" id="shadowControls" style="display:none;">
+                        <div class="rt-shadow-row">
+                            <input type="color" id="shadowColor" class="master-control rt-color-sm" value="#000000">
+                            <input type="range" id="shadowBlur" class="master-control rt-range" min="0" max="30" value="10" title="Difuminado">
                         </div>
-                        <div class="adv-group">
-                            <label class="adv-toggle">
-                                <input type="checkbox" id="checkBorder" class="master-control">
-                                <span>Borde</span>
-                            </label>
-                            <div id="borderControls" class="adv-sub" style="display:none;">
-                                <div class="adv-row">
-                                    <input type="color" id="borderColor" class="master-control" value="#ffffff">
-                                    <input type="range" id="borderWidth" class="master-control" min="0" max="15" step="0.5" value="2">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="adv-group">
-                            <label class="adv-toggle">
-                                <input type="checkbox" id="checkShadow" class="master-control">
-                                <span>Sombra</span>
-                            </label>
-                            <div id="shadowControls" class="adv-sub" style="display:none;">
-                                <div class="adv-row">
-                                    <input type="color" id="shadowColor" class="master-control" value="#000000">
-                                    <input type="range" id="shadowBlur" class="master-control" min="0" max="30" value="10" title="Difuminado">
-                                </div>
-                                <div class="adv-row">
-                                    <span class="adv-label">X:</span>
-                                    <input type="range" id="shadowX" class="master-control" min="-30" max="30" value="5">
-                                    <span class="adv-label">Y:</span>
-                                    <input type="range" id="shadowY" class="master-control" min="-30" max="30" value="5">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="adv-group" id="groupMaxWidth" style="display: none;">
-                            <label>Ancho del texto</label>
-                            <input type="range" id="maxWidthInput" class="master-control" min="50" max="450" value="300">
+                        <div class="rt-shadow-row">
+                            <span class="rt-axis-label">X</span>
+                            <input type="range" id="shadowX" class="master-control rt-range" min="-30" max="30" value="5">
+                            <span class="rt-axis-label">Y</span>
+                            <input type="range" id="shadowY" class="master-control rt-range" min="-30" max="30" value="5">
                         </div>
                     </div>
+                </div>
+
+                <div class="rt-sep"></div>
+
+                <div class="adv-group" id="groupMaxWidth" style="display: none;">
+                    <label class="rt-label">Ancho del texto</label>
+                    <input type="range" id="maxWidthInput" class="master-control rt-range" min="50" max="450" value="300">
                 </div>
             </div>
         </div>
@@ -231,12 +229,6 @@
             document.getElementById('mainSidebar').classList.add('collapsed');
             document.body.classList.add('sidebar-collapsed');
             document.getElementById('sidebarToggle').textContent = '▶';
-        }
-
-        // Toggle advanced panel
-        function toggleAdvancedPanel() {
-            const panel = document.getElementById('advancedPanel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
         }
 
         // Toggle border/shadow controls
