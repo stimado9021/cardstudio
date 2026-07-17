@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/crear-diseno.css?v=8">
+    <link rel="stylesheet" href="css/crear-diseno.css?v=9">
     <script src="../js/i18n.js"></script>
 
 </head>
@@ -242,77 +242,6 @@
             document.getElementById('mainSidebar').classList.add('collapsed');
             document.body.classList.add('sidebar-collapsed');
             document.getElementById('sidebarToggle').textContent = '▶';
-        }
-
-        // Toggle border/shadow controls
-        document.getElementById('checkBorder').addEventListener('change', function() {
-            document.getElementById('borderControls').style.display = this.checked ? 'block' : 'none';
-        });
-        document.getElementById('checkShadow').addEventListener('change', function() {
-            document.getElementById('shadowControls').style.display = this.checked ? 'block' : 'none';
-        });
-
-        // Color swatch sync
-        document.getElementById('fontColor').addEventListener('input', function() {
-            document.getElementById('colorSwatch').style.background = this.value;
-        });
-
-        // Textarea sync — direct update
-        document.getElementById('textEditInput').addEventListener('input', function() {
-            if (seleccionadoIdx !== null && textos[seleccionadoIdx]) {
-                textos[seleccionadoIdx].contenido = this.value;
-                draw();
-                if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
-            }
-        });
-
-        // Font size +/- buttons
-        function changeFontSize(delta) {
-            const input = document.getElementById('fontSize');
-            let val = parseInt(input.value) || 50;
-            val = Math.max(10, Math.min(250, val + delta));
-            input.value = val;
-            input.dispatchEvent(new Event('input'));
-        }
-
-        // Bold/Italic toggles — modify selected text
-        let isBold = false, isItalic = false;
-        function toggleBold() {
-            if (seleccionadoIdx === null) return;
-            textos[seleccionadoIdx].bold = !textos[seleccionadoIdx].bold;
-            isBold = textos[seleccionadoIdx].bold;
-            document.getElementById('btnBold').classList.toggle('active', isBold);
-            draw();
-        }
-        function toggleItalic() {
-            if (seleccionadoIdx === null) return;
-            textos[seleccionadoIdx].italic = !textos[seleccionadoIdx].italic;
-            isItalic = textos[seleccionadoIdx].italic;
-            document.getElementById('btnItalic').classList.toggle('active', isItalic);
-            draw();
-        }
-
-        // Alignment buttons
-        function setAlign(align) {
-            const sel = document.getElementById('textAlign');
-            if (sel) sel.value = align;
-            if (seleccionadoIdx !== null && textos[seleccionadoIdx]) {
-                textos[seleccionadoIdx].align = align;
-                draw();
-            }
-            document.querySelectorAll('.toolbar-btn-align').forEach(b => b.classList.remove('active'));
-            const btn = document.getElementById('btnAlign' + align.charAt(0).toUpperCase() + align.slice(1));
-            if (btn) btn.classList.add('active');
-        }
-
-        // Hidden textAlign select for compatibility
-        if (!document.getElementById('textAlign')) {
-            const sel = document.createElement('select');
-            sel.id = 'textAlign';
-            sel.className = 'master-control';
-            sel.style.display = 'none';
-            sel.innerHTML = '<option value="left">Izq</option><option value="center">Centro</option><option value="right">Der</option>';
-            document.body.appendChild(sel);
         }
 
         // Orientation control

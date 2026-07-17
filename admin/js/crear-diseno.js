@@ -4,8 +4,10 @@ let fondoImg = new Image();
 let textos = []; 
 let seleccionadoIdx = null;
 let isDragging = false;
-let offset = { x: 0, y: 0 }; // Para un arrastre suave
+let offset = { x: 0, y: 0 };
 let idDisenoActual = 0;
+let isBold = false;
+let isItalic = false;
 
 function adaptCanvasToImage(img) {
     const MAX_DIM = 700, MIN_DIM = 400;
@@ -24,50 +26,265 @@ function adaptCanvasToImage(img) {
     }
 }
 
-window.onload = async () => {
-    // Cargar categorías dinámicas
-    try {
-        const resp = await fetch('api.php?action=get_categorias');
-        const categorias = await resp.json();
-        const select = document.getElementById('categoriaSelect');
-        categorias.forEach(cat => {
-            let opt = document.createElement('option');
-            opt.value = cat.id; opt.innerHTML = cat.nombre;
-            select.appendChild(opt);
-        });
-    } catch (e) { console.error("Error al cargar categorías"); }
-    
-    // Verificar si estamos editando
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
-   
-    if (id) {
-        try {
-            const resp = await fetch(`api.php?action=get_diseno&id=${id}`);
-            const data = await resp.json();
-            if (data.success) {
-                const diseno = data.diseno;
-                idDisenoActual = diseno.id_diseno;
-                document.getElementById('nombreDiseno').value = diseno.nombre_diseno;
-                document.getElementById('categoriaSelect').value = diseno.id_categoria;
-                textos = JSON.parse(diseno.configuracion_textos_json);
-                fondoImg.src = diseno.imagen_fondo_url; 
-                fondoImg.onload = async function() {
-                    adaptCanvasToImage(fondoImg);
-                    await document.fonts.ready;
-                    draw();
-                    if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
-                };
-            } else {
-                alert(i18n.t("design_not_found"));
-                añadirTexto();
-            }
-        } catch (e) { console.error(e); añadirTexto(); }
-    } else {
-        añadirTexto();
-    }
-};
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (fondoImg.src) ctx.drawImage(fondoImg, 0, 0, canvas.width, canvas.height);
 
+    textos.forEach((t, index) => {
+        ctx.save();
+        const weight = t.bold ? 'bold ' : '';
+        const style = t.italic ? 'italic ' : '';
+        ctx.font = `${style}${weight}${t.size}px ${t.family}`;
+        
+        let lines = [];
+        let lineHeight = t.size * 1.2;
+        
+        if (t.type === 'paragraph') {
+            let paragraphs = t.contenido.split('\n');
+            for (let p of paragraphs) {
+                let words = p.split(' ');
+                let currentLine = '';
+                for (let i = 0; i < words.length; i++) {
+                    let testLine = currentLine + words[i] + ' ';
+                    let metrics = ctx.measureText(testLine);
+                    if (metrics.width > t.maxWidth && i > 0) {
+                        lines.push(currentLine.trim());
+                        currentLine = words[i] + ' ';
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                lines.push(currentLine.trim());
+            }
+            t.width = t.maxWidth;
+            t.height = lines.length * lineHeight;
+        } else {
+            lines = [t.contenido];
+            const m = ctx.measureText(t.contenido);
+            t.width = m.width; 
+            t.height = t.size;
+        }
+
+        const cx = t.x + t.width / 2;
+        const cy = t.y + t.height / 2;
+
+        ctx.translate(cx, cy);
+        ctx.rotate(t.angle);
+        ctx.translate(-cx, -cy);
+
+        if (index === seleccionadoIdx) {
+            ctx.strokeStyle = "#2E90E5";
+            ctx.setLineDash([5, 5]);
+            ctx.strokeRect(t.x - 5, t.y - 5, t.width + 10, t.height + 10);
+            ctx.setLineDash([]);
+        }
+
+        if (t.hasShadow) {
+            ctx.shadowColor = t.sColor;
+            ctx.shadowBlur = t.sBlur;
+            ctx.shadowOffsetX = t.sOffsetX;
+            ctx.shadowOffsetY = t.sOffsetY;
+        } else {
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+        }
+
+        ctx.textAlign = t.align || "left"; 
+        ctx.textBaseline = "top";
+
+        for (let i = 0; i < lines.length; i++) {
+            let ly = t.y + (i * lineHeight);
+            let lx = t.x;
+            if (t.type === 'paragraph') {
+                if (t.align === 'center') {
+                    lx = t.x + t.width / 2;
+                } else if (t.align === 'right') {
+                    lx = t.x + t.width;
+                }
+            }
+            
+            if (t.hasBorder && t.bWidth > 0) {
+                ctx.strokeStyle = t.bColor;
+                ctx.lineWidth = t.bWidth;
+                ctx.strokeText(lines[i], lx, ly);
+            }
+            ctx.fillStyle = t.color;
+            ctx.fillText(lines[i], lx, ly);
+        }
+        
+        ctx.restore();
+    });
+}
+
+function getCanvasPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top)  * scaleY
+    };
+}
+
+function hitTest(t, px, py) {
+    const PAD = 10;
+    const w = (t.width  || 10) + PAD * 2;
+    const h = (t.height || t.size || 20) + PAD * 2;
+    const cx = t.x + (t.width  || 0) / 2;
+    const cy = t.y + (t.height || t.size || 0) / 2;
+    const angle = -(t.angle || 0);
+    const dx = px - cx;
+    const dy = py - cy;
+    const rx = dx * Math.cos(angle) - dy * Math.sin(angle);
+    const ry = dx * Math.sin(angle) + dy * Math.cos(angle);
+    return Math.abs(rx) <= w / 2 && Math.abs(ry) <= h / 2;
+}
+
+// ─── PANEL CONTROL ────────────────────────────────────────────────────
+function actualizarPanelControl() {
+    if (seleccionadoIdx === null) return;
+    const t = textos[seleccionadoIdx];
+    if (!t) return;
+
+    const textarea = document.getElementById('textEditInput');
+    if (textarea) {
+        textarea.value = t.contenido || '';
+    }
+
+    const ff = document.getElementById('fontFamily');
+    if (ff) ff.value = t.family;
+
+    const fs = document.getElementById('fontSize');
+    if (fs) fs.value = t.size;
+
+    const fc = document.getElementById('fontColor');
+    if (fc) fc.value = t.color;
+
+    const ai = document.getElementById('anguloInput');
+    if (ai) ai.value = t.angle;
+
+    const cb = document.getElementById('checkBorder');
+    if (cb) cb.checked = t.hasBorder || false;
+
+    const bc = document.getElementById('borderColor');
+    if (bc) bc.value = t.bColor;
+
+    const bw = document.getElementById('borderWidth');
+    if (bw) bw.value = t.bWidth;
+
+    const cs = document.getElementById('checkShadow');
+    if (cs) cs.checked = t.hasShadow || false;
+
+    const sc = document.getElementById('shadowColor');
+    if (sc) sc.value = t.sColor;
+
+    const sb = document.getElementById('shadowBlur');
+    if (sb) sb.value = t.sBlur;
+
+    const sx = document.getElementById('shadowX');
+    if (sx) sx.value = t.sOffsetX;
+
+    const sy = document.getElementById('shadowY');
+    if (sy) sy.value = t.sOffsetY;
+
+    const bcDiv = document.getElementById('borderControls');
+    if (bcDiv) bcDiv.style.display = t.hasBorder ? 'block' : 'none';
+
+    const scDiv = document.getElementById('shadowControls');
+    if (scDiv) scDiv.style.display = t.hasShadow ? 'block' : 'none';
+
+    isBold = t.bold || false;
+    isItalic = t.italic || false;
+
+    const btnB = document.getElementById('btnBold');
+    if (btnB) btnB.classList.toggle('active', isBold);
+
+    const btnI = document.getElementById('btnItalic');
+    if (btnI) btnI.classList.toggle('active', isItalic);
+
+    const swatch = document.getElementById('colorSwatch');
+    if (swatch) swatch.style.background = t.color;
+    
+    document.querySelectorAll('.toolbar-btn-align').forEach(b => b.classList.remove('active'));
+    const alignKey = (t.align || 'left');
+    const alignBtn = document.getElementById('btnAlign' + alignKey.charAt(0).toUpperCase() + alignKey.slice(1));
+    if (alignBtn) alignBtn.classList.add('active');
+    
+    const groupMaxWidth = document.getElementById('groupMaxWidth');
+    if (groupMaxWidth) {
+        if (t.type === 'paragraph') {
+            groupMaxWidth.style.display = 'block';
+            const mw = document.getElementById('maxWidthInput');
+            if (mw) mw.value = t.maxWidth;
+            const ta = document.getElementById('textAlign');
+            if (ta) ta.value = t.align || 'left';
+        } else {
+            groupMaxWidth.style.display = 'none';
+        }
+    }
+}
+
+// ─── CAPTURAR CAMBIOS ─────────────────────────────────────────────────
+function capturarCambios() {
+    if (seleccionadoIdx === null) return;
+    const t = textos[seleccionadoIdx];
+    if (!t) return;
+
+    const textarea = document.getElementById('textEditInput');
+    if (textarea) t.contenido = textarea.value;
+
+    const ff = document.getElementById('fontFamily');
+    if (ff) t.family = ff.value;
+
+    const fs = document.getElementById('fontSize');
+    if (fs) t.size = parseInt(fs.value) || 50;
+
+    const fc = document.getElementById('fontColor');
+    if (fc) t.color = fc.value;
+
+    const ai = document.getElementById('anguloInput');
+    if (ai) t.angle = parseFloat(ai.value);
+
+    const cb = document.getElementById('checkBorder');
+    if (cb) t.hasBorder = cb.checked;
+
+    const bc = document.getElementById('borderColor');
+    if (bc) t.bColor = bc.value;
+
+    const bw = document.getElementById('borderWidth');
+    if (bw) t.bWidth = parseFloat(bw.value);
+
+    const cs = document.getElementById('checkShadow');
+    if (cs) t.hasShadow = cs.checked;
+
+    const sc = document.getElementById('shadowColor');
+    if (sc) t.sColor = sc.value;
+
+    const sb = document.getElementById('shadowBlur');
+    if (sb) t.sBlur = parseInt(sb.value);
+
+    const sx = document.getElementById('shadowX');
+    if (sx) t.sOffsetX = parseInt(sx.value);
+
+    const sy = document.getElementById('shadowY');
+    if (sy) t.sOffsetY = parseInt(sy.value);
+    
+    if (t.type === 'paragraph') {
+        const mw = document.getElementById('maxWidthInput');
+        if (mw) t.maxWidth = parseInt(mw.value);
+        const ta = document.getElementById('textAlign');
+        if (ta) t.align = ta.value;
+    }
+    
+    draw();
+    if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
+}
+
+// ─── AÑADIR / ELIMINAR ────────────────────────────────────────────────
 function añadirTexto() {
     const nuevo = {
         contenido: i18n.t("label_text") + " " + (textos.length + 1),
@@ -131,229 +348,17 @@ function eliminarCapa() {
     textos.splice(seleccionadoIdx, 1);
     seleccionadoIdx = null;
     draw();
-    
-    document.getElementById('groupMaxWidth').style.display = 'none';
-    if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
-}
-
-function actualizarPanelControl() {
-    if (seleccionadoIdx === null) return;
-    const t = textos[seleccionadoIdx];
-    
     const textarea = document.getElementById('textEditInput');
-    if (textarea) textarea.value = t.contenido || '';
-    
-    document.getElementById('fontFamily').value = t.family;
-    document.getElementById('fontSize').value = t.size;
-    document.getElementById('fontColor').value = t.color;
-    document.getElementById('anguloInput').value = t.angle;
-    document.getElementById('checkBorder').checked = t.hasBorder || false;
-    document.getElementById('borderColor').value = t.bColor;
-    document.getElementById('borderWidth').value = t.bWidth;
-    document.getElementById('checkShadow').checked = t.hasShadow || false;
-    document.getElementById('shadowColor').value = t.sColor;
-    document.getElementById('shadowBlur').value = t.sBlur;
-    document.getElementById('shadowX').value = t.sOffsetX;
-    document.getElementById('shadowY').value = t.sOffsetY;
-
-    document.getElementById('borderControls').style.display = t.hasBorder ? 'block' : 'none';
-    document.getElementById('shadowControls').style.display = t.hasShadow ? 'block' : 'none';
-
-    isBold = t.bold || false;
-    isItalic = t.italic || false;
-    document.getElementById('btnBold').classList.toggle('active', isBold);
-    document.getElementById('btnItalic').classList.toggle('active', isItalic);
-
-    const swatch = document.getElementById('colorSwatch');
-    if (swatch) swatch.style.background = t.color;
-    
-    document.querySelectorAll('.toolbar-btn-align').forEach(b => b.classList.remove('active'));
-    const alignBtn = document.getElementById('btnAlign' + (t.align || 'left').charAt(0).toUpperCase() + (t.align || 'left').slice(1));
-    if (alignBtn) alignBtn.classList.add('active');
-    
+    if (textarea) textarea.value = '';
     const groupMaxWidth = document.getElementById('groupMaxWidth');
-    if (t.type === 'paragraph') {
-        groupMaxWidth.style.display = 'block';
-        document.getElementById('maxWidthInput').value = t.maxWidth;
-        document.getElementById('textAlign').value = t.align || 'left';
-    } else {
-        groupMaxWidth.style.display = 'none';
-    }
-}
-
-function capturarCambios() {
-    if (seleccionadoIdx === null) return;
-    const t = textos[seleccionadoIdx];
-
-    t.family = document.getElementById('fontFamily').value;
-    t.contenido = document.getElementById('textEditInput').value;
-    t.size = parseInt(document.getElementById('fontSize').value) || 50;
-    t.color = document.getElementById('fontColor').value;
-    t.angle = parseFloat(document.getElementById('anguloInput').value);
-    t.hasBorder = document.getElementById('checkBorder').checked;
-    t.bColor = document.getElementById('borderColor').value;
-    t.bWidth = parseFloat(document.getElementById('borderWidth').value);
-    t.hasShadow = document.getElementById('checkShadow').checked;
-    t.sColor = document.getElementById('shadowColor').value;
-    t.sBlur = parseInt(document.getElementById('shadowBlur').value);
-    t.sOffsetX = parseInt(document.getElementById('shadowX').value);
-    t.sOffsetY = parseInt(document.getElementById('shadowY').value);
-    
-    if (t.type === 'paragraph') {
-        t.maxWidth = parseInt(document.getElementById('maxWidthInput').value);
-        t.align = document.getElementById('textAlign').value;
-    }
-    
-    draw();
+    if (groupMaxWidth) groupMaxWidth.style.display = 'none';
     if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
 }
 
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (fondoImg.src) ctx.drawImage(fondoImg, 0, 0, canvas.width, canvas.height);
-
-    textos.forEach((t, index) => {
-        ctx.save();
-        const weight = t.bold ? 'bold ' : '';
-        const style = t.italic ? 'italic ' : '';
-        ctx.font = `${style}${weight}${t.size}px ${t.family}`;
-        
-        let lines = [];
-        let lineHeight = t.size * 1.2;
-        
-        if (t.type === 'paragraph') {
-            let paragraphs = t.contenido.split('\n');
-            for (let p of paragraphs) {
-                let words = p.split(' ');
-                let currentLine = '';
-                for (let i = 0; i < words.length; i++) {
-                    let testLine = currentLine + words[i] + ' ';
-                    let metrics = ctx.measureText(testLine);
-                    if (metrics.width > t.maxWidth && i > 0) {
-                        lines.push(currentLine.trim());
-                        currentLine = words[i] + ' ';
-                    } else {
-                        currentLine = testLine;
-                    }
-                }
-                lines.push(currentLine.trim());
-            }
-            t.width = t.maxWidth;
-            t.height = lines.length * lineHeight;
-        } else {
-            lines = [t.contenido];
-            const m = ctx.measureText(t.contenido);
-            t.width = m.width; 
-            t.height = t.size;
-        }
-
-        const cx = t.x + t.width / 2;
-        const cy = t.y + t.height / 2;
-
-        ctx.translate(cx, cy);
-        ctx.rotate(t.angle);
-        ctx.translate(-cx, -cy);
-
-        // Solo dibujamos el cuadro de selección si NO estamos exportando la imagen
-        if (index === seleccionadoIdx) {
-            ctx.strokeStyle = "#2E90E5";
-            ctx.setLineDash([5, 5]);
-            ctx.strokeRect(t.x - 5, t.y - 5, t.width + 10, t.height + 10);
-            ctx.setLineDash([]);
-        }
-
-        if (t.hasShadow) {
-            ctx.shadowColor = t.sColor;
-            ctx.shadowBlur = t.sBlur;
-            ctx.shadowOffsetX = t.sOffsetX;
-            ctx.shadowOffsetY = t.sOffsetY;
-        } else {
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-        }
-
-        ctx.textAlign = t.align || "left"; 
-        ctx.textBaseline = "top";
-
-        for (let i = 0; i < lines.length; i++) {
-            let ly = t.y + (i * lineHeight);
-            let lx = t.x;
-            if (t.type === 'paragraph') {
-                if (t.align === 'center') {
-                    lx = t.x + t.width / 2;
-                } else if (t.align === 'right') {
-                    lx = t.x + t.width;
-                }
-            }
-            
-            if (t.hasBorder && t.bWidth > 0) {
-                ctx.strokeStyle = t.bColor;
-                ctx.lineWidth = t.bWidth;
-                ctx.strokeText(lines[i], lx, ly);
-            }
-            ctx.fillStyle = t.color;
-            ctx.fillText(lines[i], lx, ly);
-        }
-        
-        ctx.restore();
-    });
-}
-
-// =====================================================================
-//  INTERACCIÓN CON EL CANVAS — Mouse + Touch con escala correcta
-// =====================================================================
-
-/**
- * Convierte coordenadas del cliente (pantalla) a coordenadas del canvas,
- * teniendo en cuenta que el canvas puede estar escalado por CSS.
- */
-function getCanvasPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    // Relación entre tamaño real del canvas y tamaño visual en pantalla
-    const scaleX = canvas.width  / rect.width;
-    const scaleY = canvas.height / rect.height;
-
-    // Soporte tanto para mouse como para touch
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-    return {
-        x: (clientX - rect.left) * scaleX,
-        y: (clientY - rect.top)  * scaleY
-    };
-}
-
-/**
- * Detecta si el punto (px, py) está dentro del bounding box de un texto,
- * incluyendo rotación y un área de padding para facilitar el clic.
- */
-function hitTest(t, px, py) {
-    const PAD = 10; // píxeles extra de margen de clic
-    const w = (t.width  || 10) + PAD * 2;
-    const h = (t.height || t.size || 20) + PAD * 2;
-
-    // Centro del elemento
-    const cx = t.x + (t.width  || 0) / 2;
-    const cy = t.y + (t.height || t.size || 0) / 2;
-
-    // Rotar el punto del mouse al espacio local del texto
-    const angle = -(t.angle || 0);
-    const dx = px - cx;
-    const dy = py - cy;
-    const rx = dx * Math.cos(angle) - dy * Math.sin(angle);
-    const ry = dx * Math.sin(angle) + dy * Math.cos(angle);
-
-    return Math.abs(rx) <= w / 2 && Math.abs(ry) <= h / 2;
-}
-
-// ─── Mouse Events ────────────────────────────────────────────────────
+// ─── MOUSE EVENTS ─────────────────────────────────────────────────────
 canvas.addEventListener('mousedown', (e) => {
     e.preventDefault();
     const { x: mx, y: my } = getCanvasPos(e);
-
-    // Buscar de arriba a abajo (último elemento = más al frente)
     let encontrado = false;
     for (let i = textos.length - 1; i >= 0; i--) {
         if (hitTest(textos[i], mx, my)) {
@@ -371,6 +376,8 @@ canvas.addEventListener('mousedown', (e) => {
     }
     if (!encontrado) {
         seleccionadoIdx = null;
+        const textarea = document.getElementById('textEditInput');
+        if (textarea) textarea.value = '';
         draw();
         if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
     }
@@ -379,7 +386,6 @@ canvas.addEventListener('mousedown', (e) => {
 canvas.addEventListener('mousemove', (e) => {
     e.preventDefault();
     if (!isDragging || seleccionadoIdx === null) {
-        // Cambiar cursor para indicar elementos arrastrables
         const { x: mx, y: my } = getCanvasPos(e);
         const sobreAlgo = textos.some(t => hitTest(t, mx, my));
         canvas.style.cursor = sobreAlgo ? 'grab' : 'default';
@@ -402,11 +408,10 @@ canvas.addEventListener('mouseleave', () => {
     canvas.style.cursor = 'default';
 });
 
-// ─── Touch Events (móvil / tablet) ───────────────────────────────────
+// ─── TOUCH EVENTS ─────────────────────────────────────────────────────
 canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
     const { x: mx, y: my } = getCanvasPos(e);
-
     let encontrado = false;
     for (let i = textos.length - 1; i >= 0; i--) {
         if (hitTest(textos[i], mx, my)) {
@@ -442,12 +447,126 @@ canvas.addEventListener('touchend', () => {
     isDragging = false;
 });
 
+// ─── TOOLBAR EVENT LISTENERS ──────────────────────────────────────────
+function initToolbarListeners() {
+    // Hidden textAlign select for paragraph alignment
+    if (!document.getElementById('textAlign')) {
+        const sel = document.createElement('select');
+        sel.id = 'textAlign';
+        sel.style.display = 'none';
+        sel.innerHTML = '<option value="left">Izq</option><option value="center">Centro</option><option value="right">Der</option>';
+        document.body.appendChild(sel);
+    }
 
-document.querySelectorAll('.master-control').forEach(el => {
-    el.addEventListener('input', capturarCambios);
-    el.addEventListener('change', capturarCambios);
-});
+    // Textarea
+    const textarea = document.getElementById('textEditInput');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            if (seleccionadoIdx !== null && textos[seleccionadoIdx]) {
+                textos[seleccionadoIdx].contenido = this.value;
+                draw();
+                if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
+            }
+        });
+    }
 
+    // Font select
+    const ff = document.getElementById('fontFamily');
+    if (ff) ff.addEventListener('change', capturarCambios);
+
+    // Font size
+    const fs = document.getElementById('fontSize');
+    if (fs) fs.addEventListener('input', capturarCambios);
+
+    // Font color
+    const fc = document.getElementById('fontColor');
+    if (fc) {
+        fc.addEventListener('input', function() {
+            const swatch = document.getElementById('colorSwatch');
+            if (swatch) swatch.style.background = this.value;
+            capturarCambios();
+        });
+    }
+
+    // Angle
+    const ai = document.getElementById('anguloInput');
+    if (ai) ai.addEventListener('input', capturarCambios);
+
+    // Border toggle
+    const cb = document.getElementById('checkBorder');
+    if (cb) cb.addEventListener('change', function() {
+        const bc = document.getElementById('borderControls');
+        if (bc) bc.style.display = this.checked ? 'block' : 'none';
+        capturarCambios();
+    });
+
+    // Border color + width
+    const bcol = document.getElementById('borderColor');
+    if (bcol) bcol.addEventListener('input', capturarCambios);
+    const bwi = document.getElementById('borderWidth');
+    if (bwi) bwi.addEventListener('input', capturarCambios);
+
+    // Shadow toggle
+    const cs = document.getElementById('checkShadow');
+    if (cs) cs.addEventListener('change', function() {
+        const sc = document.getElementById('shadowControls');
+        if (sc) sc.style.display = this.checked ? 'block' : 'none';
+        capturarCambios();
+    });
+
+    // Shadow color, blur, x, y
+    const sCol = document.getElementById('shadowColor');
+    if (sCol) sCol.addEventListener('input', capturarCambios);
+    const sBlur = document.getElementById('shadowBlur');
+    if (sBlur) sBlur.addEventListener('input', capturarCambios);
+    const sX = document.getElementById('shadowX');
+    if (sX) sX.addEventListener('input', capturarCambios);
+    const sY = document.getElementById('shadowY');
+    if (sY) sY.addEventListener('input', capturarCambios);
+
+    // Max width
+    const mw = document.getElementById('maxWidthInput');
+    if (mw) mw.addEventListener('input', capturarCambios);
+}
+
+// ─── BOLD / ITALIC ────────────────────────────────────────────────────
+function toggleBold() {
+    if (seleccionadoIdx === null) return;
+    textos[seleccionadoIdx].bold = !textos[seleccionadoIdx].bold;
+    isBold = textos[seleccionadoIdx].bold;
+    document.getElementById('btnBold').classList.toggle('active', isBold);
+    draw();
+}
+
+function toggleItalic() {
+    if (seleccionadoIdx === null) return;
+    textos[seleccionadoIdx].italic = !textos[seleccionadoIdx].italic;
+    isItalic = textos[seleccionadoIdx].italic;
+    document.getElementById('btnItalic').classList.toggle('active', isItalic);
+    draw();
+}
+
+// ─── ALIGNMENT ────────────────────────────────────────────────────────
+function setAlign(align) {
+    if (seleccionadoIdx !== null && textos[seleccionadoIdx]) {
+        textos[seleccionadoIdx].align = align;
+        draw();
+    }
+    document.querySelectorAll('.toolbar-btn-align').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('btnAlign' + align.charAt(0).toUpperCase() + align.slice(1));
+    if (btn) btn.classList.add('active');
+}
+
+// ─── FONT SIZE +/- ────────────────────────────────────────────────────
+function changeFontSize(delta) {
+    const input = document.getElementById('fontSize');
+    let val = parseInt(input.value) || 50;
+    val = Math.max(10, Math.min(250, val + delta));
+    input.value = val;
+    capturarCambios();
+}
+
+// ─── BACKGROUND IMAGE ─────────────────────────────────────────────────
 document.getElementById('bgInput').onchange = (e) => {
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -457,16 +576,14 @@ document.getElementById('bgInput').onchange = (e) => {
     reader.readAsDataURL(e.target.files[0]);
 };
 
-// --- GUARDADO CON GENERACIÓN DE JPG ---
+// ─── SAVE ─────────────────────────────────────────────────────────────
 document.getElementById('btnGuardar').onclick = async () => {
     const nombre = document.getElementById('nombreDiseno').value;
     if(!nombre) { alert(i18n.t("admin_design_name")); return; }
 
-    // 1. Limpiamos selección para que la miniatura salga limpia
     seleccionadoIdx = null;
     draw();
 
-    // 2. Generamos el JPG del Canvas
     const miniaturaBase64 = canvas.toDataURL('image/jpeg', 0.8);
 
     const formData = new FormData();
@@ -482,7 +599,7 @@ document.getElementById('btnGuardar').onclick = async () => {
     }
     
     formData.append('config_json', JSON.stringify(textos));
-    formData.append('miniatura_base64', miniaturaBase64); // Enviamos el JPG
+    formData.append('miniatura_base64', miniaturaBase64);
 
     const res = await fetch('api.php?action=save_design', 
     { 
@@ -498,6 +615,7 @@ document.getElementById('btnGuardar').onclick = async () => {
     }
 };
 
+// ─── RESET ────────────────────────────────────────────────────────────
 function limpiarEditor() {
     textos = [];
     seleccionadoIdx = null;
@@ -508,6 +626,8 @@ function limpiarEditor() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     document.getElementById('nombreDiseno').value = "";
     document.getElementById('bgInput').value = "";
+    const textarea = document.getElementById('textEditInput');
+    if (textarea) textarea.value = '';
     if (typeof setOrientation === 'function') setOrientation('vertical');
     draw();
     window.history.replaceState({}, document.title, window.location.pathname);
@@ -518,3 +638,48 @@ function logout() {
         window.location.href = 'login.php';
     });
 }
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+window.onload = async () => {
+    try {
+        const resp = await fetch('api.php?action=get_categorias');
+        const categorias = await resp.json();
+        const select = document.getElementById('categoriaSelect');
+        categorias.forEach(cat => {
+            let opt = document.createElement('option');
+            opt.value = cat.id; opt.innerHTML = cat.nombre;
+            select.appendChild(opt);
+        });
+    } catch (e) { console.error("Error al cargar categorías"); }
+
+    initToolbarListeners();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+   
+    if (id) {
+        try {
+            const resp = await fetch(`api.php?action=get_diseno&id=${id}`);
+            const data = await resp.json();
+            if (data.success) {
+                const diseno = data.diseno;
+                idDisenoActual = diseno.id_diseno;
+                document.getElementById('nombreDiseno').value = diseno.nombre_diseno;
+                document.getElementById('categoriaSelect').value = diseno.id_categoria;
+                textos = JSON.parse(diseno.configuracion_textos_json);
+                fondoImg.src = diseno.imagen_fondo_url; 
+                fondoImg.onload = async function() {
+                    adaptCanvasToImage(fondoImg);
+                    await document.fonts.ready;
+                    draw();
+                    if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
+                };
+            } else {
+                alert(i18n.t("design_not_found"));
+                añadirTexto();
+            }
+        } catch (e) { console.error(e); añadirTexto(); }
+    } else {
+        añadirTexto();
+    }
+};
