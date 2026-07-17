@@ -140,7 +140,9 @@ function actualizarPanelControl() {
     if (seleccionadoIdx === null) return;
     const t = textos[seleccionadoIdx];
     
-    document.getElementById('textEditInput').value = t.contenido;
+    const textarea = document.getElementById('textEditInput');
+    if (textarea) textarea.value = t.contenido || '';
+    
     document.getElementById('fontFamily').value = t.family;
     document.getElementById('fontSize').value = t.size;
     document.getElementById('fontColor').value = t.color;
@@ -154,20 +156,17 @@ function actualizarPanelControl() {
     document.getElementById('shadowX').value = t.sOffsetX;
     document.getElementById('shadowY').value = t.sOffsetY;
 
-    document.getElementById('checkBorder').dispatchEvent(new Event('change'));
-    document.getElementById('checkShadow').dispatchEvent(new Event('change'));
+    document.getElementById('borderControls').style.display = t.hasBorder ? 'block' : 'none';
+    document.getElementById('shadowControls').style.display = t.hasShadow ? 'block' : 'none';
 
-    // Sync bold/italic buttons
     isBold = t.bold || false;
     isItalic = t.italic || false;
     document.getElementById('btnBold').classList.toggle('active', isBold);
     document.getElementById('btnItalic').classList.toggle('active', isItalic);
 
-    // Update color swatch
     const swatch = document.getElementById('colorSwatch');
     if (swatch) swatch.style.background = t.color;
     
-    // Update alignment buttons
     document.querySelectorAll('.toolbar-btn-align').forEach(b => b.classList.remove('active'));
     const alignBtn = document.getElementById('btnAlign' + (t.align || 'left').charAt(0).toUpperCase() + (t.align || 'left').slice(1));
     if (alignBtn) alignBtn.classList.add('active');
@@ -448,8 +447,6 @@ document.querySelectorAll('.master-control').forEach(el => {
     el.addEventListener('input', capturarCambios);
     el.addEventListener('change', capturarCambios);
 });
-
-document.getElementById('textEditInput').addEventListener('input', capturarCambios);
 
 document.getElementById('bgInput').onchange = (e) => {
     const reader = new FileReader();

@@ -257,6 +257,15 @@
             document.getElementById('colorSwatch').style.background = this.value;
         });
 
+        // Textarea sync — direct update
+        document.getElementById('textEditInput').addEventListener('input', function() {
+            if (seleccionadoIdx !== null && textos[seleccionadoIdx]) {
+                textos[seleccionadoIdx].contenido = this.value;
+                draw();
+                if (typeof refreshLayerPanel === 'function') refreshLayerPanel();
+            }
+        });
+
         // Font size +/- buttons
         function changeFontSize(delta) {
             const input = document.getElementById('fontSize');
