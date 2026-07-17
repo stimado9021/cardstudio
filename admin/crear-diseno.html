@@ -65,6 +65,13 @@
                     <label data-i18n="admin_bg_image">Fondo</label>
                     <input type="file" id="bgInput" class="btn-archivo" accept="image/*">
                 </div>
+                <div class="config-field">
+                    <label>Orientación</label>
+                    <div class="orient-group">
+                        <button class="orient-btn active" id="orientVertical" onclick="setOrientation('vertical')">↕ Vertical</button>
+                        <button class="orient-btn" id="orientHorizontal" onclick="setOrientation('horizontal')">↔ Horizontal</button>
+                    </div>
+                </div>
                 <div class="config-actions">
                     <button class="btn-add" onclick="añadirTexto()">+ Texto</button>
                     <button class="btn-add-paragraph" onclick="añadirParrafo()">+ Párrafo</button>
@@ -291,6 +298,22 @@
             sel.style.display = 'none';
             sel.innerHTML = '<option value="left">Izq</option><option value="center">Centro</option><option value="right">Der</option>';
             document.body.appendChild(sel);
+        }
+
+        // Orientation control
+        let currentOrientation = 'vertical';
+        function setOrientation(dir) {
+            currentOrientation = dir;
+            document.getElementById('orientVertical').classList.toggle('active', dir === 'vertical');
+            document.getElementById('orientHorizontal').classList.toggle('active', dir === 'horizontal');
+            if (!fondoImg.src || fondoImg.src === window.location.href) {
+                if (dir === 'vertical') {
+                    canvas.width = 500; canvas.height = 700;
+                } else {
+                    canvas.width = 700; canvas.height = 500;
+                }
+                draw();
+            }
         }
 
         // Tab system for mobile

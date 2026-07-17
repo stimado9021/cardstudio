@@ -507,6 +507,7 @@ function limpiarEditor() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     document.getElementById('nombreDiseno').value = "";
     document.getElementById('bgInput').value = "";
+    if (typeof setOrientation === 'function') setOrientation('vertical');
     draw();
     window.history.replaceState({}, document.title, window.location.pathname);
 }

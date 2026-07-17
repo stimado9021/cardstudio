@@ -643,6 +643,34 @@ canvas#tarjetaCanvas {
     color: var(--brand-light);
 }
 
+/* ═══════ ORIENTATION ═══════ */
+.orient-group {
+    display: flex;
+    gap: 4px;
+}
+.orient-btn {
+    padding: 7px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-strong);
+    color: var(--text-sec);
+    border-radius: var(--r-sm);
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.orient-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-on-dark);
+}
+.orient-btn.active {
+    background: rgba(46,144,229,0.15);
+    border-color: var(--brand);
+    color: var(--brand-light);
+}
+
 /* ═══════ DESKTOP NOTICE ═══════ */
 .desktop-notice { display: none; }
 .mobile-tabs { display: none; }
